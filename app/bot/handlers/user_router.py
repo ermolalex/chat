@@ -2,9 +2,13 @@ import logging
 from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, ReplyKeyboardRemove, ContentType
-#from app.api.dao import UserDAO
 from app.bot.keyboards import kbs
 from app.bot.utils.utils import greet_user, get_about_us_text
+from app.models import User, UserBase
+from app.db import db
+
+from sqlmodel import  Session
+session = Session(db.engine)
 
 user_router = Router()
 
@@ -19,6 +23,15 @@ async def share_number(message: Message):
 @user_router.message(F.contact) #ContentType.CONTACT) #content_types=ContentType.CONTACT)
 async def get_contact(message: Message):
     contact = message.contact
+
+    user = UserBase(
+        first_name=contact.first_name,
+        last_name=contact.last_name,
+        phone_number=contact.phone_number,
+        tg_id=contact.user_id
+    )
+    db.create_user(user, session)
+
     await message.answer(f"Спасибо, {contact.first_name}.\n"
                          f"Ваш номер {contact.phone_number}, ваш ID {contact.user_id}",
                          reply_markup=ReplyKeyboardRemove())
