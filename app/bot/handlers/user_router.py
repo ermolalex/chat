@@ -3,25 +3,25 @@ from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, ReplyKeyboardRemove, ContentType
 #from app.api.dao import UserDAO
-#from app.bot.keyboards import kbs
+from app.bot.keyboards import kbs
 from app.bot.utils.utils import greet_user, get_about_us_text
 
 user_router = Router()
 
 
-# @user_router.message(Command("contact"))
-# async def share_number(message: Message):
-#     await message.answer(
-#         "Нажмите на кнопку ниже, чтобы отправить контакт",
-#         reply_markup=await kbs.contact_keyboard()
-#     )
-#
-# @user_router.message(ContentType.CONTACT) #content_types=ContentType.CONTACT)
-# async def get_contact(message: Message):
-#     contact = message.contact
-#     await message.answer(f"Спасибо, {contact.full_name}.\n"
-#                          f"Ваш номер {contact.phone_number} был получен",
-#                          reply_markup=ReplyKeyboardRemove())
+@user_router.message(Command("contact"))
+async def share_number(message: Message):
+    await message.answer(
+        "Нажмите на кнопку ниже, чтобы отправить контакт",
+        reply_markup=await kbs.contact_keyboard()
+    )
+
+@user_router.message(ContentType.CONTACT) #content_types=ContentType.CONTACT)
+async def get_contact(message: Message):
+    contact = message.contact
+    await message.answer(f"Спасибо, {contact.full_name}.\n"
+                         f"Ваш номер {contact.phone_number} был получен",
+                         reply_markup=ReplyKeyboardRemove())
 
 
 @user_router.message(CommandStart())
