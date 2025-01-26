@@ -16,12 +16,12 @@ async def share_number(message: Message):
         reply_markup=await kbs.contact_keyboard()
     )
 
-@user_router.message(ContentType.CONTACT) #content_types=ContentType.CONTACT)
-async def get_contact(message: Message):
-    contact = message.contact
-    await message.answer(f"Спасибо, {contact.full_name}.\n"
-                         f"Ваш номер {contact.phone_number} был получен",
-                         reply_markup=ReplyKeyboardRemove())
+# @user_router.message(ContentType.CONTACT) #content_types=ContentType.CONTACT)
+# async def get_contact(message: Message):
+#     contact = message.contact
+#     await message.answer(f"Спасибо, {contact.full_name}.\n"
+#                          f"Ваш номер {contact.phone_number} был получен",
+#                          reply_markup=ReplyKeyboardRemove())
 
 
 @user_router.message(CommandStart())
