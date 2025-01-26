@@ -28,7 +28,7 @@ class DB:
         user_db = User.from_orm(user)
         session.add(user_db)
         session.commit()
-        return article_db
+        return user_db
 
     def get_user(self, user_id: int, session: Session) -> User:
         logger.info(f"Get User with ID {user_id} from DB")
