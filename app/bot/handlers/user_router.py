@@ -19,8 +19,8 @@ async def share_number(message: Message):
 @user_router.message(F.contact) #ContentType.CONTACT) #content_types=ContentType.CONTACT)
 async def get_contact(message: Message):
     contact = message.contact
-    await message.answer(f"Спасибо, {contact.full_name}.\n"
-                         f"Ваш номер {contact.phone_number} был получен",
+    await message.answer(f"Спасибо, {contact.first_name}.\n"
+                         f"Ваш номер {contact.phone_number}, ваш ID {contact.user_id}",
                          reply_markup=ReplyKeyboardRemove())
 
 
