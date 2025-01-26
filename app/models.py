@@ -32,7 +32,6 @@ class UserBase(SQLModel):
 class User(UserBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     phone_number: str = Field(sa_column=Column("phone_number", String, unique=True))
-    tg_id: int = Field(sa_column=Column("tg_id", Integer, unique=True))
     # fragments: List["Fragment"] = Relationship(back_populates="article", cascade_delete=True)
 
 
