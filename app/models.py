@@ -14,9 +14,9 @@ class ArticleType(str, enum.Enum):
 
 class UserBase(SQLModel):
     first_name: str
-    last_name: str
+    last_name: Optional[str] = Field(default=None, max_length=20)
     phone_number: str
-    tg_id: int
+    tg_id: Optional[int] = Field(default=None)
     # article_type: ArticleType = Field(
     #     sa_column=Column(
     #         Enum(ArticleType),
