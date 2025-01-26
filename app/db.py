@@ -1,10 +1,10 @@
 import os
 from typing import List
 from datetime import datetime, timezone
-import sqlite3
-from sqlmodel import SQLModel, create_engine, Session, select
+from sqlalchemy import exc
+from sqlmodel import SQLModel, create_engine, Session, select, delete
 from app.models import UserBase, User
-from app.exceptions import UserNotFound
+from app.exceptions import UserNotFound, UserPhoneNumberAlreadyExists
 from app.logger import create_logger
 
 # Extract the filename without extension
@@ -30,9 +30,10 @@ class DB:
         try:
             session.add(user_db)
             session.commit()
-        except sqlite3.IntegrityError:
+        except exc.IntegrityError:
             logger.info(f"User с номером телефона {user.phone_number} уже существует")
-            #user_db = self.get_user_by_phone_number(user.phone_number, session)
+            raise UserPhoneNumberAlreadyExists
+            return None
         return user_db
 
     def get_user(self, user_id: int, session: Session) -> User:
@@ -54,6 +55,13 @@ class DB:
         else:
             logger.error("User not found")
             raise UserNotFound(f"Не найден User с номером телефона {phone_number}")
+
+    def delete_all_users(self, session: Session):
+        logger.info(f"Удаление всех  User'ов")
+        statement = delete(User)
+        result = session.exec(statement)
+        session.commit()
+        logger.info(f"Удаление всех  User'ов. (result.rowcount={result.rowcount})")
 
     # def delete_article(self, article_id: int, session: Session):
     #     logger.info(f"Удаление статьи с ID {article_id}")
@@ -102,4 +110,4 @@ class DB:
     #     session.commit()
 
 sqlite_file_name = "database.db"
-db = DB(sqlite_file_name)
+#db = DB(sqlite_file_name)

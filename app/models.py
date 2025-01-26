@@ -1,5 +1,6 @@
 from typing import Optional, List
 import enum
+from datetime import datetime, timezone
 
 from sqlalchemy import String, Integer
 from sqlalchemy.sql.schema import Column
@@ -17,6 +18,11 @@ class UserBase(SQLModel):
     last_name: Optional[str] = Field(default=None, max_length=20)
     phone_number: str
     tg_id: Optional[int] = Field(default=None)
+    created_at: datetime = Field(
+        default=datetime.now(timezone.utc),
+        nullable=False,
+        description="The timestamp of when the task was created",
+    )
     # article_type: ArticleType = Field(
     #     sa_column=Column(
     #         Enum(ArticleType),

@@ -5,9 +5,11 @@ from aiogram.types import Message, ReplyKeyboardRemove, ContentType
 from app.bot.keyboards import kbs
 from app.bot.utils.utils import greet_user, get_about_us_text
 from app.models import User, UserBase
-from app.db import db
 
+from app.db import DB
 from sqlmodel import  Session
+
+db = DB()
 session = Session(db.engine)
 
 user_router = Router()
