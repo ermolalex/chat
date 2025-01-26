@@ -1,6 +1,7 @@
 import os
 from typing import List
 from datetime import datetime, timezone
+import sqlite3
 from sqlmodel import SQLModel, create_engine, Session, select
 from app.models import UserBase, User
 from app.exceptions import UserNotFound
@@ -26,8 +27,12 @@ class DB:
         """
         logger.info("Adding User")
         user_db = User.from_orm(user)
-        session.add(user_db)
-        session.commit()
+        try:
+            session.add(user_db)
+            session.commit()
+        except sqlite3.IntegrityError:
+            logger.info(f"User с номером телефона {user.phone_number} уже существует")
+            #user_db = self.get_user_by_phone_number(user.phone_number, session)
         return user_db
 
     def get_user(self, user_id: int, session: Session) -> User:
@@ -39,6 +44,16 @@ class DB:
         else:
             logger.error("User not found")
             raise UserNotFound(f"Не найден User с id {user_id}")
+
+    def get_user_by_phone_number(self, phone_number: str, session: Session) -> User:
+        logger.info(f"Get User by phone_number {phone_number}")
+        statement = select(User).where(User.phone_number == phone_number)
+        result: User = session.exec(statement).first()
+        if result:
+            return result
+        else:
+            logger.error("User not found")
+            raise UserNotFound(f"Не найден User с номером телефона {phone_number}")
 
     # def delete_article(self, article_id: int, session: Session):
     #     logger.info(f"Удаление статьи с ID {article_id}")
