@@ -25,21 +25,21 @@ class DB:
         Returns:
             created User
         """
-        logger.info("Adding User")
+        logger.info(f"Adding User {user}")
         user_db = User.from_orm(user)
         try:
             session.add(user_db)
             session.commit()
         except exc.IntegrityError:
             logger.info(f"User с номером телефона {user.phone_number} уже существует")
+            session.rollback()
             raise UserPhoneNumberAlreadyExists
-            return None
         return user_db
 
     def get_user(self, user_id: int, session: Session) -> User:
         logger.info(f"Get User with ID {user_id} from DB")
         statement = select(User).where(User.id == user_id)
-        result: User = session.exec(statement).first()
+        result: User = session.exec(statement).one_or_none()
         if result:
             return result
         else:

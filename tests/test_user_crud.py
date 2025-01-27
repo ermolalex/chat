@@ -1,4 +1,5 @@
 import pytest
+from sqlmodel import select, func
 from app.models import User
 from app.exceptions import UserNotFound, UserPhoneNumberAlreadyExists
 
@@ -12,7 +13,7 @@ def test_create_and_read(db_instance_empty, session, user1):
     assert user.first_name == user1.first_name
     assert user.phone_number == user1.phone_number
 
-def _test_integrity_error_handling(db_instance_empty, session, user1, user2):
+def test_integrity_error_handling(db_instance_empty, session, user1, user2):
     # Write User to DB
     db_instance_empty.create_user(user1, session)
     user2.phone_number = user1.phone_number
@@ -21,6 +22,17 @@ def _test_integrity_error_handling(db_instance_empty, session, user1, user2):
         res = db_instance_empty.create_user(user2, session)
 
 
+
+###  Для изучения SQLModel
+def test_count(db_instance_empty, session, user1, user2):
+    db_instance_empty.create_user(user1, session)
+    statement = select(func.count()).select_from(User)
+    number_of_users = session.exec(statement).one()
+    assert number_of_users == 1
+
+    db_instance_empty.create_user(user2, session)
+    number_of_users = session.exec(statement).one()
+    assert number_of_users == 2
 #
 # def test_read_all_tasks(db_instance_empty, session, task1, task2):
 #     """
