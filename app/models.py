@@ -7,10 +7,11 @@ from sqlalchemy.sql.schema import Column
 from sqlmodel import Field, SQLModel, Relationship, Column, Enum
 
 
-class ArticleType(str, enum.Enum):
-    Pdf = "pdf"
-    Plain = "plain"
-    Url = "url"
+class UserType(str, enum.Enum):
+    Staff = "staff"
+    Client = "client"
+    Anonim = "anonim"
+    Admin = "admin"
 
 
 class UserBase(SQLModel):
@@ -23,16 +24,14 @@ class UserBase(SQLModel):
         nullable=False,
         description="The timestamp of when the task was created",
     )
-    # article_type: ArticleType = Field(
-    #     sa_column=Column(
-    #         Enum(ArticleType),
-    #         nullable=False,
-    #         index=False
-    #     ),
-    #     default=ArticleType.Plain,
-    # )
-    # url: Optional[str] = Field(default="")
-    # text: Optional[str] = Field(default="")
+    user_type: UserType = Field(
+        sa_column=Column(
+            Enum(UserType),
+            nullable=False,
+            index=False
+        ),
+        default=UserType.Client,
+    )
 
 
 class User(UserBase, table=True):

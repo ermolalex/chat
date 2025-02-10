@@ -41,7 +41,8 @@ async def get_contact(message: Message):
 
 @user_router.message(CommandStart())
 async def cmd_start(message: Message) -> None:
-    logging.info("SОбрабатываем команду /start.")
+    user_id = message.from_user.id
+    logging.info(f"Обрабатываем команду /start от пользователя с id={user_id}")
     """
     Обрабатывает команду /start.
     user = await UserDAO.find_one_or_none(telegram_id=message.from_user.id)
