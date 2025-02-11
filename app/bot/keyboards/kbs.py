@@ -6,7 +6,7 @@ from app.config import settings
 
 async def contact_keyboard() -> ReplyKeyboardMarkup:
     kb = ReplyKeyboardBuilder()
-    kb.button(text="📱 Отправить", request_contact=True)
+    kb.button(text="📱 Отправить__", request_contact=True)
     kb.button(text="ℹ️ О нас")
     # if user_id == settings.ADMIN_ID:
     kb.button(text="🔑 Админ панель")
