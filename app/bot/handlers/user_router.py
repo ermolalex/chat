@@ -55,7 +55,7 @@ async def cmd_start(message: Message) -> None:
         )
 
     """
-    await message.answer(get_about_us_text()) #, reply_markup=kb)
+    await message.answer(get_about_us_text(), reply_markup=kbs.contact_keyboard())
     # await greet_user(message) #, is_new_user=not user)
 #
 # @user_router.message(F.text == '🔙 Назад')

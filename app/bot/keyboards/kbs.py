@@ -4,7 +4,7 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from app.config import settings
 
 
-async def contact_keyboard() -> ReplyKeyboardMarkup:
+def contact_keyboard() -> ReplyKeyboardMarkup:
     kb = ReplyKeyboardBuilder()
     kb.button(text="📱 Отправить__", request_contact=True)
     kb.button(text="ℹ️ О нас")
