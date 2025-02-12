@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
@@ -65,7 +66,8 @@ async def user_message(message: Message) -> None:
     """
     user_id = message.from_user.id
     logging.info(f"Получено сообщение {message.text} от пользователя с id={user_id}")
-    await message.answer("")
+    await asyncio.sleep(0)
+    #await message.answer("")
 
     # try:
     #     # Send a copy of the received message
