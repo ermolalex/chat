@@ -47,7 +47,8 @@ async def index_post(request: Request) -> None:
 
 @app.post("/webhook")
 async def webhook(request: Request) -> None:
-    print(request, request.method, request.body())
+    await request.body()
+    print(request, request.method)
     logging.info("Received webhook request")
     update = Update.model_validate(await request.json(), context={"bot": bot})
     await dp.feed_update(bot, update)

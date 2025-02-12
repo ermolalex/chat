@@ -65,14 +65,14 @@ async def user_message(message: Message) -> None:
     """
     user_id = message.from_user.id
     logging.info(f"Получено сообщение {message.text} от пользователя с id={user_id}")
+    await message.answer("")
 
-
-    try:
-        # Send a copy of the received message
-        await message.send_copy(chat_id=message.chat.id)
-    except TypeError:
-        # But not all the types is supported to be copied so need to handle it
-        await message.answer("Nice try!")
+    # try:
+    #     # Send a copy of the received message
+    #     await message.send_copy(chat_id=message.chat.id)
+    # except TypeError:
+    #     # But not all the types is supported to be copied so need to handle it
+    #     await message.answer("Nice try!")
 
 #
 # @user_router.message(F.text == '🔙 Назад')
