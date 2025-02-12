@@ -22,7 +22,7 @@ class UserBase(SQLModel):
     created_at: datetime = Field(
         default=datetime.now(timezone.utc),
         nullable=False,
-        description="The timestamp of when the task was created",
+        description="The timestamp of when the User was created",
     )
     user_type: UserType = Field(
         sa_column=Column(
