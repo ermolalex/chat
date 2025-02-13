@@ -3,7 +3,7 @@ from typing import List
 from datetime import datetime, timezone
 from sqlalchemy import exc
 from sqlmodel import SQLModel, create_engine, Session, select, delete
-from app.models import UserBase, User
+from app.models import UserBase, User, TgUserMessageBase, TgUserMessage
 from app.exceptions import UserNotFound, UserPhoneNumberAlreadyExists
 from app.logger import create_logger
 
@@ -90,6 +90,25 @@ class DB:
         result = session.exec(statement)
         session.commit()
         logger.info(f"Удаление всех  User'ов. (result.rowcount={result.rowcount})")
+
+    def add_tg_message(self, message: TgUserMessageBase, session: Session):
+        message_db = TgUserMessage.from_orm(message)
+        try:
+            session.add(message_db)
+            session.commit()
+            logger.info(f"Добавлено сообщение от {message_db.user.first_name}: {message_db.text[:20]}...")
+        except Exception as e:
+            logger.info(f"Ошибка при добавлении сообщения от {message_db.user.first_name}: {message_db.text[:20]}...")
+            session.rollback()
+            raise
+        return #user_db
+
+    def get_messages(self, session: Session) -> List[TgUserMessage]:
+        logger.info("Читаем все сообщения из БД")
+        statement = select(TgUserMessage)
+        results = session.exec(statement)
+        return [r for r in results]
+
 
     # def delete_article(self, article_id: int, session: Session):
     #     logger.info(f"Удаление статьи с ID {article_id}")

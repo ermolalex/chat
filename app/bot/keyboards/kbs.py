@@ -1,4 +1,4 @@
-from aiogram.types import ReplyKeyboardMarkup, WebAppInfo, InlineKeyboardMarkup
+from aiogram.types import ReplyKeyboardMarkup, WebAppInfo, InlineKeyboardMarkup, ReplyKeyboardRemove
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 from app.config import settings
@@ -7,9 +7,9 @@ from app.config import settings
 def contact_keyboard() -> ReplyKeyboardMarkup:
     kb = ReplyKeyboardBuilder()
     kb.button(text="📱 Отправить", request_contact=True)
-    kb.button(text="ℹ️ О нас")
-    # if user_id == settings.ADMIN_ID:
-    kb.button(text="🔑 Админ панель")
+    # kb.button(text="ℹ️ О нас")
+    # # if user_id == settings.ADMIN_ID:
+    # kb.button(text="🔑 Админ панель")
     kb.adjust(1)
     return kb.as_markup(resize_keyboard=True)
 
@@ -25,6 +25,8 @@ def main_keyboard(user_id: int, first_name: str) -> ReplyKeyboardMarkup:
     kb.button(text="🔑 Админ панель")
     kb.adjust(1)
     return kb.as_markup(resize_keyboard=True)
+
+
 
 """
 def back_keyboard() -> ReplyKeyboardMarkup:

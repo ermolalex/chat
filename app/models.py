@@ -2,7 +2,7 @@ from typing import Optional, List
 import enum
 from datetime import datetime, timezone
 
-from sqlalchemy import String, Integer
+from sqlalchemy import String, Integer, table
 from sqlalchemy.sql.schema import Column
 from sqlmodel import Field, SQLModel, Relationship, Column, Enum
 
@@ -40,7 +40,31 @@ class UserBase(SQLModel):
 class User(UserBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     phone_number: str = Field(sa_column=Column("phone_number", String, unique=True))
-    # fragments: List["Fragment"] = Relationship(back_populates="article", cascade_delete=True)
+    messages: List["TgUserMessage"] = Relationship(back_populates="user", cascade_delete=False)
+
+
+class TgUserMessageBase(SQLModel):
+    from_u_id: int
+    from_u_tg_id: int
+    to_u_id: Optional[int] = Field(default=None)
+    sent_at: datetime = Field(
+        default=datetime.now(timezone.utc),
+        nullable=False,
+        description="Когда сообщение отправлено",
+    )
+    read: bool = Field(default=False)
+    read_at: datetime = Field(
+        default=None,
+        nullable=False,
+        description="Когда сообщение прочитано",
+    )
+    text: str
+
+class TgUserMessage(TgUserMessageBase, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(default=None, foreign_key="user.id", ondelete="RESTRICT")
+    user: User = Relationship(back_populates="tg_messages")
+
 
 
 # class FragmentBase(SQLModel):

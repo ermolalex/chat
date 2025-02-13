@@ -5,7 +5,7 @@ from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, ReplyKeyboardRemove, ContentType
 from app.bot.keyboards import kbs
 from app.bot.utils.utils import greet_user, get_about_us_text
-from app.models import User, UserBase
+from app.models import User, UserBase, TgUserMessageBase
 
 from app.db import DB
 from sqlmodel import  Session
@@ -37,7 +37,8 @@ async def get_contact(message: Message):
 
     await message.answer(f"Спасибо, {contact.first_name}.\n"
                          f"Ваш номер {contact.phone_number}, ваш ID {contact.user_id}.\n"
-                         f"Теперь вы можете написать нам о своей проблеме.")
+                         f"Теперь вы можете написать нам о своей проблеме.",
+                         reply_markup=ReplyKeyboardRemove())
 
 
 @user_router.message(CommandStart())
@@ -69,15 +70,24 @@ async def user_message(message: Message) -> None:
     user = db.get_user_one_or_none(filter, session)
 
     if not user:
-        await message.answer("Учетка не заведена (нет такого пользователя)")
+        await message.answer(
+            "Вы еще не отправили ваш номер телефона.\n"
+            "Нажмите на кнопку ОТПРАВИТЬ ниже."
+        )
         return
 
-    logging.info(f"Получено сообщение {message.text} от пользователя {user}")
-    if not user.activated:
-        await message.answer("Учетка не активирована")
-        return
+    # logging.info(f"Получено сообщение {message.text} от пользователя {user}")
+    # if not user.activated:
+    #     await message.answer("Учетка не активирована")
+    #     return
 
     # сохраним сообщение в БД todo
+    tg_message = TgUserMessageBase(
+        from_u_id=user.id,
+        from_u_tg_id=user.tg_id,
+        text=message.text
+    )
+    db.add_tg_message(tg_message)
 
     await asyncio.sleep(0)
     #await message.answer("")
