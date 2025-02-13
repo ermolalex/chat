@@ -64,8 +64,21 @@ async def user_message(message: Message) -> None:
     """
     By default, message handler will handle all message types (like a text, photo, sticker etc.)
     """
-    user_id = message.from_user.id
-    logging.info(f"Получено сообщение {message.text} от пользователя с id={user_id}")
+    user_tg_id = message.from_user.id
+    filter={"tg_id": user_tg_id}
+    user = db.get_user_one_or_none(filter, session)
+
+    if not user:
+        await message.answer("Учетка не заведена (нет такого пользователя)")
+        return
+
+    logging.info(f"Получено сообщение {message.text} от пользователя {user}")
+    if not user.activated:
+        await message.answer("Учетка не активирована")
+        return
+
+    # сохраним сообщение в БД todo
+
     await asyncio.sleep(0)
     #await message.answer("")
 

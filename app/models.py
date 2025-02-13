@@ -32,6 +32,9 @@ class UserBase(SQLModel):
         ),
         default=UserType.Client,
     )
+    pin_code: Optional[str] = Field(default=None, max_length=4)
+    activated: bool = Field(default=False)
+
 
 
 class User(UserBase, table=True):

@@ -33,13 +33,13 @@ class DB:
         except exc.IntegrityError:
             logger.info(f"Клиент с номером телефона {user.phone_number} уже существует")
             session.rollback()
-        except Exception as e:
-            logger.info(f"Не удалось добавить Клиента {user} - {e}")
-            session.rollback()
+        # except Exception as e:
+        #     logger.info(f"Не удалось добавить Клиента {user} - {e}")
+        #     session.rollback()
             #raise UserPhoneNumberAlreadyExists
         return #user_db
 
-    def get_user(self, user_id: int, session: Session) -> User:
+    def get_user_by_id(self, user_id: int, session: Session) -> User:
         logger.info(f"Get User with ID {user_id} from DB")
         statement = select(User).where(User.id == user_id)
         result: User = session.exec(statement).one_or_none()
@@ -48,6 +48,31 @@ class DB:
         else:
             logger.error("User not found")
             raise UserNotFound(f"Не найден User с id {user_id}")
+
+    def get_user_one_or_none(self, filter: dict, session: Session):
+        logger.info(f"Поиск Пользователя по фильтру: {filter}")
+
+        if "id" in filter.keys():
+            statement = select(User).where(User.id == filter["id"])
+        elif "phone_number" in filter.keys():
+            statement = select(User).where(User.phone_number == filter["phone_number"])
+        elif "tg_id" in filter.keys():
+            statement = select(User).where(User.tg_id == filter["tg_id"])
+        elif "first_name" in filter.keys():
+            statement = select(User).where(User.first_name == filter["first_name"])
+        else:
+            raise UserNotFound(f"Некорректный фильтр для поиска пользователя - {filter}")
+
+        try:
+            result: User = session.exec(statement).one_or_none()
+
+            log_message = f"Пользователь {'найден' if result else 'не найден'}"
+            logger.info(log_message)
+            return result
+        except exc.SQLAlchemyError as e:
+            logger.error(f"Ошибка при поиске Пользователя по фильтрам {filters}: {e}")
+            raise
+
 
     def get_user_by_phone_number(self, phone_number: str, session: Session) -> User:
         logger.info(f"Get User by phone_number {phone_number}")
