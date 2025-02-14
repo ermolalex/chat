@@ -72,7 +72,8 @@ async def user_message(message: Message) -> None:
     if not user:
         await message.answer(
             "Вы еще не отправили ваш номер телефона.\n"
-            "Нажмите на кнопку ОТПРАВИТЬ ниже."
+            "Нажмите на кнопку ОТПРАВИТЬ ниже.",
+            reply_markup=kbs.contact_keyboard()
         )
         return
 
