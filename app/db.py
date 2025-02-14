@@ -29,15 +29,17 @@ class DB:
         try:
             session.add(user_db)
             session.commit()
+            session.refresh(user_db)
             logger.info(f"Добавлен Клиент {user}.")
         except exc.IntegrityError:
             logger.info(f"Клиент с номером телефона {user.phone_number} уже существует")
             session.rollback()
-        # except Exception as e:
-        #     logger.info(f"Не удалось добавить Клиента {user} - {e}")
-        #     session.rollback()
-            #raise UserPhoneNumberAlreadyExists
-        return #user_db
+            user_db = None
+        except Exception as e:
+            logger.info(f"Не удалось добавить Клиента {user} - {e}")
+            session.rollback()
+            user_db = None
+        return user_db
 
     def get_user_by_id(self, user_id: int, session: Session) -> User:
         logger.info(f"Get User with ID {user_id} from DB")
@@ -96,9 +98,10 @@ class DB:
         try:
             session.add(message_db)
             session.commit()
+            session.refresh(message_db)
             logger.info(f"Добавлено сообщение от {message_db.user.first_name}: {message_db.text[:20]}...")
         except Exception as e:
-            logger.info(f"Ошибка при добавлении сообщения от {message_db.user.first_name}: {message_db.text[:20]}...")
+            logger.info(f"Ошибка при сохранения сообщения {message_db}...")
             session.rollback()
             raise
         return #user_db

@@ -14,11 +14,13 @@ def test_tg_msg_creation():
 
 def test_create_and_read_tg_msg(db_instance_empty, session, user1):
     # Write User to DB
-    db_instance_empty.create_user(user1, session)
+    user = db_instance_empty.create_user(user1, session)
+
+    assert user.id == 1
 
     tg_msg = TgUserMessageBase(
-        from_u_id=user1.id,
-        from_u_tg_id=user1.tg_id,
+        from_u_id=user.id,
+        from_u_tg_id=user.tg_id,
         text="Hello world"
     )
 

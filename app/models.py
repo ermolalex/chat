@@ -40,7 +40,7 @@ class UserBase(SQLModel):
 class User(UserBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     phone_number: str = Field(sa_column=Column("phone_number", String, unique=True))
-    messages: List["TgUserMessage"] = Relationship(back_populates="user", cascade_delete=False)
+    tg_messages: List["TgUserMessage"] = Relationship(back_populates="user", cascade_delete=False)
 
 
 class TgUserMessageBase(SQLModel):
@@ -53,16 +53,16 @@ class TgUserMessageBase(SQLModel):
         description="Когда сообщение отправлено",
     )
     read: bool = Field(default=False)
-    read_at: datetime = Field(
+    read_at: Optional[datetime] = Field(
         default=None,
-        nullable=False,
+        #nullable=False,
         description="Когда сообщение прочитано",
     )
     text: str
 
 class TgUserMessage(TgUserMessageBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int = Field(default=None, foreign_key="user.id", ondelete="RESTRICT")
+    from_u_id: int = Field(default=None, foreign_key="user.id", ondelete="RESTRICT")
     user: User = Relationship(back_populates="tg_messages")
 
 
