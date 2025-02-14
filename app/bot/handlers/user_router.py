@@ -87,7 +87,7 @@ async def user_message(message: Message) -> None:
         from_u_tg_id=user.tg_id,
         text=message.text
     )
-    db.add_tg_message(tg_message)
+    db.add_tg_message(tg_message, session)
 
     await asyncio.sleep(0)
     #await message.answer("")
