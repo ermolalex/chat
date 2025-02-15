@@ -12,6 +12,7 @@ class ChatMessage(ft.Row):
     def __init__(self, message: Message):
         super().__init__()
         self.vertical_alignment = ft.CrossAxisAlignment.START
+        self.alignment = ft.MainAxisAlignment.END
         self.controls = [
             ft.CircleAvatar(
                 content=ft.Text(self.get_initials(message.user_name)),
@@ -21,7 +22,7 @@ class ChatMessage(ft.Row):
             ft.Column(
                 [
                     ft.Text(message.user_name, weight="bold"),
-                    ft.Text(message.text, selectable=True),
+                    ft.Text(message.text, selectable=True,),
                 ],
                 tight=True,
                 spacing=5,
@@ -155,4 +156,4 @@ def main(page: ft.Page):
     )
 
 
-ft.app(target=main)
+ft.app(target=main, view=None, host='0.0.0.0', port=8501)
