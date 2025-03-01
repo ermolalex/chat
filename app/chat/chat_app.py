@@ -9,10 +9,11 @@ class Message:
 
 
 class ChatMessage(ft.Row):
-    def __init__(self, message: Message):
+    def __init__(self, message: Message, my_own: bool):
         super().__init__()
         self.vertical_alignment = ft.CrossAxisAlignment.START
-        self.alignment = ft.MainAxisAlignment.END
+        if my_own:
+            self.alignment = ft.MainAxisAlignment.END
         self.controls = [
             ft.CircleAvatar(
                 content=ft.Text(self.get_initials(message.user_name)),
@@ -90,7 +91,8 @@ def main(page: ft.Page):
 
     def on_message(message: Message):
         if message.message_type == "chat_message":
-            m = ChatMessage(message)
+            my_own_message = True if message.user_name == page.session.get("user_name") else False
+            m = ChatMessage(message, my_own_message)
         elif message.message_type == "login_message":
             m = ft.Text(message.text, italic=True, color=ft.Colors.BLACK45, size=12)
         chat.controls.append(m)
