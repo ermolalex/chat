@@ -12,20 +12,21 @@ class RabbitPublisher:
 
         self.credentials = PlainCredentials(settings.RABBIT_USER, settings.RABBIT_USER_PSW)
         self.connection_params = ConnectionParameters(
-            host="localhost",  # "89.38.135.232",
+            host="localhost", # "89.38.135.232",
             port=5672,
-            credentials=credentials,
+            credentials=self.credentials,
         )
 
-
-    def publish(self, msg):
-        with BlockingConnection(connection_params) as conn:
+    def publish(self, msg_text: str):
+        with BlockingConnection(self.connection_params) as conn:
             with conn.channel() as ch:
                 ch.queue_declare(queue=self.queue)
+
+                # test
+                msg = {'type': 'chat_message', 'message': msg_text, 'username': 'sasa', 'room': 'room2'}
 
                 ch.basic_publish(
                     exchange=self.exchange,
                     routing_key=self.routing_key,
                     body=json.dumps(msg)
                 )
-

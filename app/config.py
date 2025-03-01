@@ -5,6 +5,8 @@ class Settings(BaseSettings):
     BOT_TOKEN: str
     BASE_SITE: str
     ADMIN_ID: int
+    RABBIT_USER: str
+    RABBIT_USER_PSW: str
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env")
     )

@@ -6,14 +6,19 @@ from aiogram.types import Message, ReplyKeyboardRemove, ContentType
 from app.bot.keyboards import kbs
 from app.bot.utils.utils import greet_user, get_about_us_text
 from app.models import User, UserBase, TgUserMessageBase
+from app.bot.utils.rabbit_publisher import RabbitPublisher
+from app.config import settings
 
 from app.db import DB
 from sqlmodel import  Session
+
 
 db = DB()
 session = Session(db.engine)
 
 user_router = Router()
+
+publisher = RabbitPublisher()
 
 
 @user_router.message(Command("contact"))
@@ -89,6 +94,8 @@ async def user_message(message: Message) -> None:
         text=message.text
     )
     db.add_tg_message(tg_message, session)
+
+    publisher.publish(message.text)
 
     await asyncio.sleep(0)
     #await message.answer("")

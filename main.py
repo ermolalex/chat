@@ -36,13 +36,13 @@ app = FastAPI(lifespan=lifespan)
 app.mount('/static', StaticFiles(directory='app/static'), 'static')
 
 
-@app.post("/")
-async def index_post(request: Request) -> None:
-    print(request, request.method, request.body())
-
-@app.get("/")
-async def index_post(request: Request) -> None:
-    print(request, request.method, request.body())
+# @app.post("/")
+# async def index_post(request: Request) -> None:
+#     print(request, request.method, request.body())
+#
+# @app.get("/")
+# async def index_post(request: Request) -> None:
+#     print(request, request.method, request.body())
 
 
 @app.post("/webhook")
