@@ -17,7 +17,7 @@ class DB:
     def __init__(self, db_file_name=""):
         if db_file_name == "":
             db_file_name = "database.db"
-        self.engine = create_engine(f"sqlite:///{db_file_name}", echo=True)
+        self.engine = create_engine(f"sqlite:///{db_file_name}", echo=False)
         SQLModel.metadata.create_all(self.engine)
 
     def create_user(self, user: UserBase, session: Session) -> User:

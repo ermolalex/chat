@@ -18,7 +18,7 @@ session = Session(db.engine)
 
 user_router = Router()
 
-publisher = RabbitPublisher()
+rabbit_publisher = RabbitPublisher()
 
 
 @user_router.message(Command("contact"))
@@ -95,7 +95,14 @@ async def user_message(message: Message) -> None:
     )
     db.add_tg_message(tg_message, session)
 
-    publisher.publish(message.text)
+    rabbit_publisher.publish(
+        message.text,
+        {
+            'user_name': user.first_name,
+            'user_phone': user.phone_number,
+            'user_tg_id': user.tg_id,
+        }
+    )
 
     await asyncio.sleep(0)
     #await message.answer("")

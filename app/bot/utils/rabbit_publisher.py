@@ -17,13 +17,17 @@ class RabbitPublisher:
             credentials=self.credentials,
         )
 
-    def publish(self, msg_text: str):
+    def publish(self, msg_text: str, user: dict):
+        # examples/consume_recover.py
         with BlockingConnection(self.connection_params) as conn:
             with conn.channel() as ch:
                 ch.queue_declare(queue=self.queue)
 
-                # test
-                msg = {'type': 'chat_message', 'message': msg_text, 'username': 'sasa', 'room': 'room2'}
+                user_name = user['user_name']
+                user_phone  = user['user_phone'],
+                user_tg_id  = user['user_tg_id']
+
+                msg = {'type': 'tg.message', 'message': msg_text, 'username': user_name, 'room': user_tg_id, 'user_phone': user_phone}
 
                 ch.basic_publish(
                     exchange=self.exchange,
