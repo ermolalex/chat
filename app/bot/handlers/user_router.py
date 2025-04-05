@@ -6,7 +6,7 @@ from aiogram.types import Message, ReplyKeyboardRemove, ContentType
 from app.bot.keyboards import kbs
 from app.bot.utils.utils import greet_user, get_about_us_text
 from app.models import User, UserBase, TgUserMessageBase
-from app.bot.utils.rabbit_publisher import RabbitPublisher
+#from app.bot.utils.rabbit_publisher import RabbitPublisher
 from app.config import settings
 
 from app.db import DB
@@ -18,8 +18,7 @@ session = Session(db.engine)
 
 user_router = Router()
 
-rabbit_publisher = RabbitPublisher()
-
+#rabbit_publisher = RabbitPublisher()
 
 @user_router.message(Command("contact"))
 async def share_number(message: Message):
@@ -95,14 +94,14 @@ async def user_message(message: Message) -> None:
     )
     db.add_tg_message(tg_message, session)
 
-    rabbit_publisher.publish(
-        message.text,
-        {
-            'user_name': user.first_name,
-            'user_phone': user.phone_number,
-            'user_tg_id': user.tg_id,
-        }
-    )
+    # rabbit_publisher.publish(
+    #     message.text,
+    #     {
+    #         'user_name': user.first_name,
+    #         'user_phone': user.phone_number,
+    #         'user_tg_id': user.tg_id,
+    #     }
+    # )
 
     await asyncio.sleep(0)
     #await message.answer("")

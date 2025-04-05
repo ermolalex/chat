@@ -1,5 +1,7 @@
 import logging
 from contextlib import asynccontextmanager
+import uvicorn
+
 from app.bot.create_bot import bot, dp, stop_bot, start_bot
 # from app.bot.handlers.admin_router import admin_router
 from app.bot.handlers.user_router import user_router
@@ -20,10 +22,10 @@ async def lifespan(app: FastAPI):
     # dp.include_router(admin_router)
     await start_bot()
     webhook_url = settings.get_webhook_url()
-    await bot.set_webhook(url=webhook_url,
-                          allowed_updates=dp.resolve_used_update_types(),
-                          drop_pending_updates=True)
-    logging.info(f"Webhook set to {webhook_url}")
+    # await bot.set_webhook(url=webhook_url,
+    #                       allowed_updates=dp.resolve_used_update_types(),
+    #                       drop_pending_updates=True)
+    # logging.info(f"Webhook set to {webhook_url}")
     yield
     logging.info("Shutting down bot...")
     await bot.delete_webhook()
@@ -40,9 +42,10 @@ app.mount('/static', StaticFiles(directory='app/static'), 'static')
 # async def index_post(request: Request) -> None:
 #     print(request, request.method, request.body())
 #
-# @app.get("/")
-# async def index_post(request: Request) -> None:
-#     print(request, request.method, request.body())
+
+@app.get("/")
+async def index(request: Request) -> None:
+    return {"hello": "world"}
 
 
 @app.post("/webhook")
