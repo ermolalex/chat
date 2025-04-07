@@ -5,8 +5,14 @@ class Settings(BaseSettings):
     BOT_TOKEN: str
     BASE_SITE: str
     ADMIN_ID: int
+    ZULIP_API_KEY: str
+    ZULIP_EMAIL: str
+    ZULIP_SITE: str
+    ZULIP_ALLOW_INSECURE: bool
+
     RABBIT_USER: str
     RABBIT_USER_PSW: str
+
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env")
     )

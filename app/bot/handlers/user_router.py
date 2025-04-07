@@ -6,6 +6,7 @@ from aiogram.types import Message, ReplyKeyboardRemove, ContentType
 from app.bot.keyboards import kbs
 from app.bot.utils.utils import greet_user, get_about_us_text
 from app.models import User, UserBase, TgUserMessageBase
+from app.zulip_client import ZulipClient
 #from app.bot.utils.rabbit_publisher import RabbitPublisher
 from app.config import settings
 
@@ -17,6 +18,7 @@ db = DB()
 session = Session(db.engine)
 
 user_router = Router()
+zulip_client = ZulipClient()
 
 #rabbit_publisher = RabbitPublisher()
 
@@ -39,10 +41,20 @@ async def get_contact(message: Message):
     )
     db.create_user(user, session)
 
-    await message.answer(f"Спасибо, {contact.first_name}.\n"
-                         f"Ваш номер {contact.phone_number}, ваш ID {contact.user_id}.\n"
-                         f"Теперь вы можете написать нам о своей проблеме.",
-                         reply_markup=ReplyKeyboardRemove())
+    msg_text = f"""Спасибо, {contact.first_name}.\n
+               Ваш номер {contact.phone_number}, ваш ID {contact.user_id}.\n
+               Теперь вы можете написать нам о своей проблеме."""
+
+    zulip_client.send_msg_to_channel(
+        channel="bot_events",
+        topic="новый подписчик",
+        msg=msg_text
+    )
+
+    await message.answer(
+        msg_text,
+        reply_markup=ReplyKeyboardRemove()
+    )
 
 
 @user_router.message(CommandStart())
