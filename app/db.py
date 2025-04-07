@@ -72,7 +72,7 @@ class DB:
             logger.info(log_message)
             return result
         except exc.SQLAlchemyError as e:
-            logger.error(f"Ошибка при поиске Пользователя по фильтрам {filters}: {e}")
+            logger.error(f"Ошибка при поиске Пользователя по фильтрам {filter}: {e}")
             raise
 
 
