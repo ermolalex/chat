@@ -61,10 +61,10 @@ async def get_contact(message: Message):
         msg=msg_text
     )
 
-    channel_name = str(contact.phone_number)
+    channel_name = user.channel_name
     if not zulip_client.is_channel_exists(channel_name):
         # если для клиента еще не создан канал, то создаем его
-        # название канала - номер телефона
+        # название канала - номер телефона и + спереди
         zulip_client.subscribe_to_channel(channel_name)
 
     await message.answer(
@@ -123,7 +123,7 @@ async def user_message(message: Message) -> None:
     db.add_tg_message(tg_message, session)
 
     # отправим сообщение в Zulip
-    channel_name = str(user.phone_number)
+    channel_name = user.channel_name
     zulip_client.send_msg_to_channel(channel_name, "от бота", message.text)
 
     # rabbit_publisher.publish(

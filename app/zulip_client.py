@@ -99,34 +99,32 @@ class ZulipClient():
 
 
 if __name__ == '__main__':
-    logger.basicConfig(level=logger.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
     try:
         client = ZulipClient()
     except ZulipException:
         sys.exit("Фатальная ошибка! Выполнение программы прекращено!")
         
         
+    # add channel / subscribe_to_channel
+    #
+    print(client.subscribe_to_channel("+79219376763"))
 
     # send_msg_to_channel
     #
-    # client.send_msg_to_channel(
-    #     "test",
-    #     "tg_bot",
-    #     "Тестовое сообщение 5"
-    # )
+    client.send_msg_to_channel(
+        "+79219376763",
+        "tg_bot",
+        "Тестовое сообщение 5"
+    )
 
     # get_channel_id
     #
-    try:
-        ch_name = "Zulip"
-        print(f"ID of channel '{ch_name}' is: {client.get_channel_id(ch_name)}")
-        ch_name = "not_exist"
-        print(f"ID of channel '{ch_name}' is: {client.get_channel_id(ch_name)}")
-    except ZulipException as e:
-        print(e)
+    # try:
+    #     ch_name = "Zulip"
+    #     print(f"ID of channel '{ch_name}' is: {client.get_channel_id(ch_name)}")
+    #     ch_name = "not_exist"
+    #     print(f"ID of channel '{ch_name}' is: {client.get_channel_id(ch_name)}")
+    # except ZulipException as e:
+    #     print(e)
 
 
-    # subscribe_to_channel
-    #
-    #print(client.subscribe_to_channel("новый"))

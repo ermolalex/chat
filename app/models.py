@@ -35,6 +35,10 @@ class UserBase(SQLModel):
     pin_code: Optional[str] = Field(default=None, max_length=4)
     activated: bool = Field(default=False)
 
+    @property
+    def channel_name(self):
+        return f"+{self.phone_number}"
+
 
 
 class User(UserBase, table=True):
