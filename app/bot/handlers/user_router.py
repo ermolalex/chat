@@ -1,3 +1,4 @@
+import sys
 import asyncio
 import logging
 from aiogram import Router, F
@@ -6,7 +7,7 @@ from aiogram.types import Message, ReplyKeyboardRemove, ContentType
 from app.bot.keyboards import kbs
 from app.bot.utils.utils import greet_user, get_about_us_text
 from app.models import User, UserBase, TgUserMessageBase
-from app.zulip_client import ZulipClient
+from app.zulip_client import ZulipClient, ZulipException
 #from app.bot.utils.rabbit_publisher import RabbitPublisher
 from app.config import settings
 
@@ -18,7 +19,14 @@ db = DB()
 session = Session(db.engine)
 
 user_router = Router()
-zulip_client = ZulipClient()
+
+try:
+    zulip_client = ZulipClient()
+except ZulipException:
+    msg = "Фатальная ошибка при попытке коннекта к Zulip-серверу! Бот не запущен!"
+    logging.critical(msg)
+    sys.exit(msg)
+
 
 #rabbit_publisher = RabbitPublisher()
 
@@ -42,14 +50,19 @@ async def get_contact(message: Message):
     db.create_user(user, session)
 
     msg_text = f"""Спасибо, {contact.first_name}.\n
-               Ваш номер {contact.phone_number}, ваш ID {contact.user_id}.\n
-               Теперь вы можете написать нам о своей проблеме."""
+        Ваш номер {contact.phone_number}, ваш ID {contact.user_id}.\n
+        Теперь вы можете написать нам о своей проблеме."""
 
     zulip_client.send_msg_to_channel(
         channel="bot_events",
         topic="новый подписчик",
         msg=msg_text
     )
+
+    if not zulip_client.is_channel_exists(contact.phone_number):
+        # если для клиента еще не создан канал, то создаем его
+        # название канала - номер телефона
+        zulip_client.subscribe_to_channel(contact.phone_number)
 
     await message.answer(
         msg_text,
@@ -105,6 +118,9 @@ async def user_message(message: Message) -> None:
         text=message.text
     )
     db.add_tg_message(tg_message, session)
+
+    # отправим сообщение в Zulip
+    zulip_client.send_msg_to_channel(user.phone_number, "от бота", message.text)
 
     # rabbit_publisher.publish(
     #     message.text,
