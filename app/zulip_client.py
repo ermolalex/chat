@@ -9,8 +9,8 @@ class ZulipException(Exception):
 
 class ZulipClient():
     def __init__(self):
-        self._create_client()
         self.is_active = False
+        self._create_client()
 
     def _create_client(self):
         try:
@@ -102,21 +102,21 @@ if __name__ == '__main__':
 
     # send_msg_to_channel
     #
-    # client.send_msg_to_channel(
-    #     "test",
-    #     "tg_bot",
-    #     "Тестовое сообщение 4"
-    # )
+    client.send_msg_to_channel(
+        "test",
+        "tg_bot",
+        "Тестовое сообщение 5"
+    )
 
     # get_channel_id
     #
-    try:
-        ch_name = "Zulip"
-        print(f"ID of channel '{ch_name}' is: {client.get_channel_id(ch_name)}")
-        ch_name = "not_exist"
-        print(f"ID of channel '{ch_name}' is: {client.get_channel_id(ch_name)}")
-    except ZulipException as e:
-        print(e)
+    # try:
+    #     ch_name = "Zulip"
+    #     print(f"ID of channel '{ch_name}' is: {client.get_channel_id(ch_name)}")
+    #     ch_name = "not_exist"
+    #     print(f"ID of channel '{ch_name}' is: {client.get_channel_id(ch_name)}")
+    # except ZulipException as e:
+    #     print(e)
 
 
     # subscribe_to_channel
