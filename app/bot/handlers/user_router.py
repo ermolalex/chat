@@ -56,7 +56,7 @@ async def get_contact(message: Message):
         Теперь вы можете написать нам о своей проблеме."""
 
     zulip_client.send_msg_to_channel(
-        channel="bot_events",
+        channel_name="bot_events",
         topic="новый подписчик",
         msg=msg_text
     )
