@@ -28,21 +28,26 @@ class ZulipClient():
         except Exception as e:
             self.is_active = False
             logger.fatal(e)
-            raise ZulipException(e)
+            # raise ZulipException(e)
 
-    def send_msg_to_channel(self, channel: str, topic: str, msg: str) -> str:
-        if not self.is_active:
-            logger.warning("ZulipClient не настроен!")
-            return
-
+    def send_msg_to_channel(self, channel_name: str, topic: str, msg: str) -> str:
         request = {
             "type": "channel",
-            "to": channel,
+            "to": channel_name,
             "topic": topic,
             "content": msg,
         }
         result = self.client.send_message(request)
-        logger.info(result)
+
+        # {'result': 'error', 'msg': "Channel with ID '79219376763' does not exist", 'stream_id': 79219376763,
+        # 'code': 'STREAM_DOES_NOT_EXIST'}
+
+        if result["result"] == "success":
+            logger.info(f"Отправлено сообщение в канал '{channel_name}'")
+        else:
+            err_msg = f"Ошибка при отправлении сообщения в канал'{channel_name}' - {result.get('msg', '')}"
+            logger.warning(err_msg)
+            #raise ZulipException(err_msg)
 
     def get_channel_id(self, channel_name: str) -> int:
         # по названию канала возвращает его ID, или 0, если канала нет
@@ -50,8 +55,8 @@ class ZulipClient():
         # {'result': 'error', 'msg': "Invalid channel name 'tg_bot'", 'code': 'BAD_REQUEST'}
         # {'result': 'success', 'msg': '', 'stream_id': 6}
 
-        if not channel_name:
-            raise ValueError("Не указано название канала.")
+        # if not channel_name:
+        #     raise ValueError("Не указано название канала.")
 
         result = self.client.get_stream_id(channel_name)
 
@@ -62,7 +67,7 @@ class ZulipClient():
         else:
             err_msg = f"Ошибка при обращении к каналу (get_channel_id) '{channel_name}' - {result.get('msg', '')}"
             logger.warning(err_msg)
-            raise ZulipException(err_msg)
+            # raise ZulipException(err_msg)
 
     def is_channel_exists(self, channel_name: str) -> bool:
         channel_id = self.get_channel_id(channel_name)
@@ -72,8 +77,8 @@ class ZulipClient():
         # Create and subscribe to channel.
         # {'result': 'success', 'msg': '', 'subscribed': {'8': ['канал про все']}, 'already_subscribed': {}} - если канал создали
         # {'result': 'success', 'msg': '', 'subscribed': {}, 'already_subscribed': {'8': ['Zulip']}} - если канал уже был
-        if not channel_name:
-            raise ValueError("Не указано название канала.")
+        # if not channel_name:
+        #     raise ValueError("Не указано название канала.")
 
         result = self.client.add_subscriptions(
             streams=[
@@ -90,7 +95,7 @@ class ZulipClient():
         else:
             err_msg = f"Ошибка при подписании на канал '{channel_name}' - {result.get('msg', '')}"
             logger.warning(err_msg)
-            raise ZulipException(err_msg)
+            # raise ZulipException(err_msg)
 
 
 if __name__ == '__main__':
