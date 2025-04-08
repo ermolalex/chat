@@ -1,20 +1,22 @@
 import sys
 import asyncio
-import logging
+
 from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, ReplyKeyboardRemove, ContentType
+from sqlmodel import  Session
+
 from app.bot.keyboards import kbs
 from app.bot.utils.utils import greet_user, get_about_us_text
 from app.models import User, UserBase, TgUserMessageBase
 from app.zulip_client import ZulipClient, ZulipException
 #from app.bot.utils.rabbit_publisher import RabbitPublisher
 from app.config import settings
-
 from app.db import DB
-from sqlmodel import  Session
+from app.logger import create_logger
 
 
+logger = create_logger(logger_name=__name__)
 db = DB()
 session = Session(db.engine)
 
@@ -24,7 +26,7 @@ try:
     zulip_client = ZulipClient()
 except ZulipException:
     msg = "Фатальная ошибка при попытке коннекта к Zulip-серверу! Бот не запущен!"
-    logging.critical(msg)
+    logger.critical(msg)
     sys.exit(msg)
 
 
@@ -73,7 +75,7 @@ async def get_contact(message: Message):
 @user_router.message(CommandStart())
 async def cmd_start(message: Message) -> None:
     user_id = message.from_user.id
-    logging.info(f"Обрабатываем команду /start от пользователя с id={user_id}")
+    logger.info(f"Обрабатываем команду /start от пользователя с id={user_id}")
     """
     Обрабатывает команду /start.
     user = await UserDAO.find_one_or_none(telegram_id=message.from_user.id)
@@ -106,7 +108,7 @@ async def user_message(message: Message) -> None:
         )
         return
 
-    # logging.info(f"Получено сообщение {message.text} от пользователя {user}")
+    # logger.info(f"Получено сообщение {message.text} от пользователя {user}")
     # if not user.activated:
     #     await message.answer("Учетка не активирована")
     #     return

@@ -1,8 +1,10 @@
 import sys
-import logging
 import zulip
 
 from app.config import settings
+from app.logger import create_logger
+
+logger = create_logger(logger_name=__name__)
 
 class ZulipException(Exception):
     pass
@@ -21,16 +23,16 @@ class ZulipClient():
                 insecure=settings.ZULIP_ALLOW_INSECURE
             )
             self.is_active = True
-            logging.info("ZulipClient настроен.")
+            logger.info("ZulipClient настроен.")
 
         except Exception as e:
             self.is_active = False
-            logging.fatal(e)
+            logger.fatal(e)
             raise ZulipException(e)
 
     def send_msg_to_channel(self, channel: str, topic: str, msg: str) -> str:
         if not self.is_active:
-            logging.warning("ZulipClient не настроен!")
+            logger.warning("ZulipClient не настроен!")
             return
 
         request = {
@@ -40,7 +42,7 @@ class ZulipClient():
             "content": msg,
         }
         result = self.client.send_message(request)
-        logging.info(result)
+        logger.info(result)
 
     def get_channel_id(self, channel_name: str) -> int:
         # по названию канала возвращает его ID, или 0, если канала нет
@@ -59,7 +61,7 @@ class ZulipClient():
             return 0
         else:
             err_msg = f"Ошибка при обращении к каналу (get_channel_id) '{channel_name}' - {result.get('msg', '')}"
-            logging.warning(err_msg)
+            logger.warning(err_msg)
             raise ZulipException(err_msg)
 
     def is_channel_exists(self, channel_name: str) -> bool:
@@ -83,16 +85,16 @@ class ZulipClient():
         )
 
         if result["result"] == "success":
-            logging.info(f"Пользователь подписан на канал '{channel_name}'")
+            logger.info(f"Пользователь подписан на канал '{channel_name}'")
             return channel_name
         else:
             err_msg = f"Ошибка при подписании на канал '{channel_name}' - {result.get('msg', '')}"
-            logging.warning(err_msg)
+            logger.warning(err_msg)
             raise ZulipException(err_msg)
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    logger.basicConfig(level=logger.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
     try:
         client = ZulipClient()
