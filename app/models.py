@@ -37,7 +37,7 @@ class UserBase(SQLModel):
 
     @property
     def channel_name(self):
-        return f"+{self.phone_number}"
+        return f"{self.phone_number}_{self.tg_id}"
 
 
 
