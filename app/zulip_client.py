@@ -1,4 +1,5 @@
 import sys
+import requests
 import zulip
 
 from app.config import settings
@@ -97,6 +98,30 @@ class ZulipClient():
             logger.warning(err_msg)
             # raise ZulipException(err_msg)
 
+    def get_group_members(self, group_id: int):
+        # возвращает массив [user_ids]
+        try:
+            group_id = int(group_id)
+        except ValueError:
+            logger.warning(f"Неправильный номер группы Zulip - {group_id}")
+            return []
+
+        params = {
+            'direct_member_only': 'false',
+        }
+
+        response = requests.get(
+            f'{settings.ZULIP_SITE}/api/v1/user_groups/{group_id}/members',
+            params=params,
+            auth=(settings.ZULIP_EMAIL, settings.ZULIP_API_KEY),
+        )
+
+        response = response.json()
+        if response["result"] == "success":
+            return response["members"]
+
+        return []
+
 
 if __name__ == '__main__':
     try:
@@ -107,15 +132,15 @@ if __name__ == '__main__':
         
     # add channel / subscribe_to_channel
     #
-    print(client.subscribe_to_channel("+79219376763"))
+    # print(client.subscribe_to_channel("+79219376763"))
 
     # send_msg_to_channel
     #
-    client.send_msg_to_channel(
-        "+79219376763",
-        "tg_bot",
-        "Тестовое сообщение 5"
-    )
+    # client.send_msg_to_channel(
+    #     "+79219376763",
+    #     "tg_bot",
+    #     "Тестовое сообщение 5"
+    # )
 
     # get_channel_id
     #
@@ -127,4 +152,6 @@ if __name__ == '__main__':
     # except ZulipException as e:
     #     print(e)
 
-
+    # get_
+    group_id = 47 # ТехОтдел
+    print(client.get_group_members(group_id))

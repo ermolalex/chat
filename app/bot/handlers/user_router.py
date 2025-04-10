@@ -63,8 +63,6 @@ async def get_contact(message: Message):
 
     channel_name = user.channel_name
     if not zulip_client.is_channel_exists(channel_name):
-        # если для клиента еще не создан канал, то создаем его
-        # название канала - номер телефона и + спереди
         zulip_client.subscribe_to_channel(channel_name)
 
     await message.answer(
