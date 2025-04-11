@@ -19,14 +19,16 @@ def send_msg_to_bot(user_tg_id, text):
 
 def on_message(msg: dict):
     # print(msg)
-    if msg["subject"] == "от бота" and msg["client"] == "website":
-        channel_name = msg["display_recipient"]
-        phone, user_tg_id = tuple(channel_name.split("_"))
+    if msg["client"] == "website" and msg["subject"][0] == "+" :   # todo  - первый символ - 7, значит это номер телефона ))
+        topik_name = msg["subject"]
+        phone, user_tg_id = tuple(topik_name.split("_"))
         if user_tg_id and user_tg_id.isnumeric():
-            print(f"Сообщение в адрес {channel_name}: {msg['content']}")
+            print(f"Сообщение в адрес {topik_name}: {msg['content']}")
             send_msg_to_bot(user_tg_id, msg['content'])
 
+print("Zulip listener started...")
 zulip_client.call_on_each_message(on_message)
+
 
 # от ТгБота
 # {'id': 86, 'sender_id': 8, 'content': 'проблема 7', 'recipient_id': 20, 'timestamp': 1744282058, 'client': 'ZulipPython',
