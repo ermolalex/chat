@@ -93,6 +93,16 @@ class DB:
         session.commit()
         logger.info(f"Удаление всех  User'ов. (result.rowcount={result.rowcount})")
 
+    def set_user_zulip_channel_id(self, user_id, zulip_channel_id, session):
+        with session:
+            statement = select(User).where(User.id == user_id)
+            results = session.exec(statement)
+            user = results.one()
+            user.zulip_channel_id = zulip_channel_id
+            session.add(user)
+            session.commit()
+            session.refresh(user)
+
     def add_tg_message(self, message: TgUserMessageBase, session: Session):
         message_db = TgUserMessage.from_orm(message)
         try:
