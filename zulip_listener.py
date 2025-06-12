@@ -1,6 +1,7 @@
 import sys
 import zulip
 import requests
+from sqlmodel import  Session
 from app.db import DB
 from app.logger import create_logger
 
