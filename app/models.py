@@ -23,7 +23,6 @@ class UserBase(SQLModel):
     created_at: datetime = Field(
         default=datetime.now(timezone.utc),
         nullable=False,
-        description="The timestamp of when the User was created",
     )
     user_type: UserType = Field(
         sa_column=Column(
@@ -38,7 +37,17 @@ class UserBase(SQLModel):
 
     @property
     def topic_name(self):
-        return f"{self.phone_number}_{self.tg_id}"
+        return f"{self.fio}_{self.tg_id}"
+
+    @property
+    def fio(self):
+        fio = self.first_name
+        if self.last_name:
+            fio += f" {self.last_name}"
+        return fio
+
+    def __str__(self):
+        return f"{self.fio}, тел:{self.phone_number}, tg_id:{self.tg_id}"
 
 
 

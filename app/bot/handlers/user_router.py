@@ -71,6 +71,7 @@ async def get_contact(message: Message):
         tg_id=contact.user_id
     )
     user_db = db.create_user(user, session)
+    logger.info(f"Получены новые контакты: {user}. Польз.добавлен в БД.")
 
     msg_text = f"""Спасибо, {contact.first_name}.\n
         Ваш номер {contact.phone_number}, ваш ID {contact.user_id}.\n
@@ -100,8 +101,9 @@ async def get_contact(message: Message):
             zulip_client.send_msg_to_channel(
                 channel_name="bot_events",
                 topic="новый подписчик",
-                msg=f"Для пользователя {user.first_name} ({user.phone_number}) создан канал Zulip с id={channel_id}.",
+                msg=f"Для пользователя {user} создан канал Zulip с id={channel_id}.",
             )
+            logger.info(f"Для пользователя {user} создан канал Zulip с id={channel_id}.")
 
 
     await message.answer(
@@ -127,7 +129,7 @@ async def user_message(message: Message) -> None:
         )
         return
 
-    # logger.info(f"Получено сообщение {message.text} от пользователя {user}")
+    logger.info(f"Получено сообщение от бота {message.text} от пользователя {user}")
     # if not user.activated:
     #     await message.answer("Учетка не активирована")
     #     return
@@ -153,25 +155,3 @@ async def user_message(message: Message) -> None:
     # )
 
     await asyncio.sleep(0)
-    #await message.answer("")
-
-    # try:
-    #     # Send a copy of the received message
-    #     await message.send_copy(chat_id=message.chat.id)
-    # except TypeError:
-    #     # But not all the types is supported to be copied so need to handle it
-    #     await message.answer("Nice try!")
-
-#
-# @user_router.message(F.text == '🔙 Назад')
-# async def cmd_back_home(message: Message) -> None:
-#     """
-#     Обрабатывает нажатие кнопки "Назад".
-#     """
-#     await greet_user(message, is_new_user=False)
-#
-# @user_router.message(F.text == "ℹ️ О нас")
-# async def about_us(message: Message):
-#     #kb = app_keyboard(user_id=message.from_user.id, first_name=message.from_user.first_name)
-#     # await message.answer(get_about_us_text(), reply_markup=kb)
-#     await message.answer(get_about_us_text())
