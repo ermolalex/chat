@@ -1,6 +1,15 @@
 import sys
 import zulip
 import requests
+from app.db import DB
+from app.logger import create_logger
+
+
+logger = create_logger(logger_name=__name__)
+
+db = DB()
+session = Session(db.engine)
+
 
 from app.zulip_client import ZulipClient
 from app.config import settings
@@ -26,7 +35,14 @@ def on_message(msg: dict):
             print(f"Сообщение в адрес {topic}: {msg['content']}")
             send_msg_to_bot(user_tg_id, msg['content'])
 
+
+messages = db.get_messages(session)
+if len(messages) > 0 :
+    print(f"DB accessible: {len(messages)}")
+
+
 zulip_client.call_on_each_message(on_message)
+
 
 # от ТгБота
 # {'id': 86, 'sender_id': 8, 'content': 'проблема 7', 'recipient_id': 20, 'timestamp': 1744282058, 'client': 'ZulipPython',
