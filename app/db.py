@@ -8,7 +8,8 @@ from app.exceptions import UserNotFound, UserPhoneNumberAlreadyExists
 from app.logger import create_logger
 
 # Extract the filename without extension
-filename = os.path.splitext(os.path.basename(__file__))[0]
+# filename = os.path.splitext(os.path.basename(__file__))[0]
+# sqlite_file_name = "database.db"
 
 logger = create_logger(logger_name=__name__)
 
@@ -93,6 +94,16 @@ class DB:
         session.commit()
         logger.info(f"Удаление всех  User'ов. (result.rowcount={result.rowcount})")
 
+    def set_user_zulip_channel_id(self, user_id, zulip_channel_id, session):
+        with session:
+            statement = select(User).where(User.id == user_id)
+            results = session.exec(statement)
+            user = results.one()
+            user.zulip_channel_id = zulip_channel_id
+            session.add(user)
+            session.commit()
+            session.refresh(user)
+
     def add_tg_message(self, message: TgUserMessageBase, session: Session):
         message_db = TgUserMessage.from_orm(message)
         try:
@@ -111,53 +122,3 @@ class DB:
         statement = select(TgUserMessage)
         results = session.exec(statement)
         return [r for r in results]
-
-
-    # def delete_article(self, article_id: int, session: Session):
-    #     logger.info(f"Удаление статьи с ID {article_id}")
-    #     statement = select(Article).where(Article.id == article_id)
-    #     article = session.exec(statement).one()
-    #     session.delete(article)
-    #     session.commit()
-    #
-    # def get_article_list(self, session: Session) -> List[Article]:
-    #     logger.info("Reading all Articles from DB")
-    #     statement = select(Article)
-    #     results = session.exec(statement)
-    #     return [r for r in results]
-    #
-    # def save_fragments(self, article: Article, fragments: list[FragmentBase], session: Session):
-    #     if len(fragments) == 0:
-    #         return
-    #
-    #     for fragment in fragments:
-    #         fragment_db = Fragment.from_orm(fragment)
-    #         fragment_db.article = article
-    #         fragment_db.article_id = article.id
-    #         session.add(fragment_db)
-    #
-    #     session.commit()
-    #
-    # def get_fragments(self, article_id:int, session: Session) -> List[Fragment]:
-    #     logger.info("Reading fragments of Article from DB")
-    #     statement = select(Fragment).where(Fragment.article_id == article_id)
-    #     result = session.exec(statement).all()
-    #     return [fr for fr in result]
-    #
-    # def in_vocab(self, word: str,  session: Session) -> bool:
-    #     statement = select(Vocab).where(Vocab.word == word)
-    #     result = session.exec(statement).all()
-    #     return len(result) > 0
-    #
-    # def add_vocab(self, word: str, session: Session):
-    #     if len(word) < 3:
-    #         return
-    #     if self.in_vocab(word, session):
-    #         return
-    #     item = Vocab()
-    #     item.word = word
-    #     session.add(item)
-    #     session.commit()
-
-sqlite_file_name = "database.db"
-#db = DB(sqlite_file_name)

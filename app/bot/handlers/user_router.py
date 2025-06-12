@@ -39,39 +39,6 @@ async def share_number(message: Message):
         reply_markup=await kbs.contact_keyboard()
     )
 
-@user_router.message(F.contact) #ContentType.CONTACT) #content_types=ContentType.CONTACT)
-async def get_contact(message: Message):
-    contact = message.contact
-
-    user = UserBase(
-        first_name=contact.first_name,
-        last_name=contact.last_name,
-        phone_number=contact.phone_number,
-        tg_id=contact.user_id
-    )
-    db.create_user(user, session)
-
-    msg_text = f"""Спасибо, {contact.first_name}.\n
-        Ваш номер {contact.phone_number}, ваш ID {contact.user_id}.\n
-        Теперь вы можете написать нам о своей проблеме."""
-
-    zulip_client.send_msg_to_channel(
-        channel_name="bot_events",
-        topic="новый подписчик",
-        msg=msg_text
-    )
-
-    channel_name = user.channel_name
-    if not zulip_client.is_channel_exists(channel_name):
-        # если для клиента еще не создан канал, то создаем его
-        # название канала - номер телефона и + спереди
-        zulip_client.subscribe_to_channel(channel_name)
-
-    await message.answer(
-        msg_text,
-        reply_markup=ReplyKeyboardRemove()
-    )
-
 
 @user_router.message(CommandStart())
 async def cmd_start(message: Message) -> None:
@@ -91,6 +58,57 @@ async def cmd_start(message: Message) -> None:
     """
     await message.answer(get_about_us_text(), reply_markup=kbs.contact_keyboard())
     # await greet_user(message) #, is_new_user=not user)
+
+
+@user_router.message(F.contact) #ContentType.CONTACT) #content_types=ContentType.CONTACT)
+async def get_contact(message: Message):
+    contact = message.contact
+
+    user = UserBase(
+        first_name=contact.first_name,
+        last_name=contact.last_name,
+        phone_number=contact.phone_number,
+        tg_id=contact.user_id
+    )
+    user_db = db.create_user(user, session)
+
+    msg_text = f"""Спасибо, {contact.first_name}.\n
+        Ваш номер {contact.phone_number}, ваш ID {contact.user_id}.\n
+        Теперь вы можете написать нам о своей проблеме."""
+
+    zulip_client.send_msg_to_channel(
+        channel_name="bot_events",
+        topic="новый подписчик",
+        msg=msg_text
+    )
+
+    # сначала channel_name = user.topic_name = [phone]_[tg_id]
+    # после того как получис channel_id и сохраним его,
+    # channel_name можно в Zulip переименовать вручную в понятное название клиента
+    channel_name = user.topic_name
+
+    if not user.zulip_channel_id:
+        if not zulip_client.is_channel_exists(channel_name):
+            # если в Zulip еще нет канала пользователя, то
+            # - создаем канал
+            # - получаем его ID
+            # - записываем ID в свойства user-а
+            zulip_client.subscribe_to_channel(channel_name)
+            channel_id = zulip_client.get_channel_id(channel_name)
+            db.set_user_zulip_channel_id(user_db.id, channel_id, session)
+
+            zulip_client.send_msg_to_channel(
+                channel_name="bot_events",
+                topic="новый подписчик",
+                msg=f"Для пользователя {user.first_name} ({user.phone_number}) создан канал Zulip с id={channel_id}.",
+            )
+
+
+    await message.answer(
+        msg_text,
+        reply_markup=ReplyKeyboardRemove()
+    )
+
 
 @user_router.message(F.text)
 async def user_message(message: Message) -> None:
@@ -123,8 +141,7 @@ async def user_message(message: Message) -> None:
     db.add_tg_message(tg_message, session)
 
     # отправим сообщение в Zulip
-    channel_name = user.channel_name
-    zulip_client.send_msg_to_channel(channel_name, "от бота", message.text)
+    zulip_client.send_msg_to_channel(user.zulip_channel_id, user.topic_name, message.text)
 
     # rabbit_publisher.publish(
     #     message.text,

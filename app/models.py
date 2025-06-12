@@ -19,6 +19,7 @@ class UserBase(SQLModel):
     last_name: Optional[str] = Field(default=None, max_length=20)
     phone_number: str
     tg_id: Optional[int] = Field(default=None)
+    zulip_channel_id: Optional[int] = Field(default=0)
     created_at: datetime = Field(
         default=datetime.now(timezone.utc),
         nullable=False,
@@ -36,7 +37,7 @@ class UserBase(SQLModel):
     activated: bool = Field(default=False)
 
     @property
-    def channel_name(self):
+    def topic_name(self):
         return f"{self.phone_number}_{self.tg_id}"
 
 
