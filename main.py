@@ -48,6 +48,12 @@ async def index(request: Request) -> None:
     return {"hello": "world"}
 
 
+# @app.post("/set_channel_name/{channel_id}/{chanel_name}")
+# async def set_channel_name(request: Request, channel_id, chanel_name) -> None:
+#     await request.body()
+#     print(request, request.method, channel_id, chanel_name)
+
+
 @app.post("/webhook")
 async def webhook(request: Request) -> None:
     await request.body()
