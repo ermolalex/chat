@@ -4,16 +4,13 @@ import requests
 from sqlmodel import  Session
 from app.db import DB
 from app.logger import create_logger
-
+from app.zulip_client import ZulipClient
+from app.config import settings
 
 logger = create_logger(logger_name=__name__)
 
 db = DB()
 session = Session(db.engine)
-
-
-from app.zulip_client import ZulipClient
-from app.config import settings
 
 zulip_client = ZulipClient().client
 
@@ -41,7 +38,7 @@ messages = db.get_messages(session)
 if len(messages) > 0 :
     print(f"DB accessible: {len(messages)}")
 
-
+print(zulip_client)
 zulip_client.call_on_each_message(on_message)
 
 
