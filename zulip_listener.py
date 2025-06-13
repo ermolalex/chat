@@ -13,6 +13,14 @@ db = DB()
 session = Session(db.engine)
 
 zulip_client = ZulipClient().client
+"""   !!!! Важно
+Пользователь, от лица которого создается клиент, 
+(прописан в переменных окружения ZULIP_API_KEY, ZULIP_EMAIL)
+д.б. подписан на каналы, сообщения в которых нужно перехватывать.
+=> Пользователь ТГБот д.б. подписан на все каналы.  
+"""
+# todo Пользователь ТГБот д.б. подписан на все каналы.
+# todo все сотрудники ТехОтдела д.б. подписаны на все каналы.
 
 
 def send_msg_to_bot(user_tg_id, text):
@@ -38,7 +46,7 @@ messages = db.get_messages(session)
 if len(messages) > 0 :
     print(f"DB accessible: {len(messages)}")
 
-print(zulip_client)
+
 zulip_client.call_on_each_message(on_message)
 
 
