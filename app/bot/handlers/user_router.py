@@ -91,10 +91,10 @@ async def get_contact(message: Message):
     if not user.zulip_channel_id:
         if not zulip_client.is_channel_exists(channel_name):
             # если в Zulip еще нет канала пользователя, то
-            # - создаем канал
+            # - создаем канал, и подписываем на него всех сотрудников
             # - получаем его ID
             # - записываем ID в свойства user-а
-            zulip_client.subscribe_to_channel(channel_name)
+            zulip_client.subscribe_to_channel(channel_name, settings.ZULIP_STAFF_IDS)
             channel_id = zulip_client.get_channel_id(channel_name)
             db.set_user_zulip_channel_id(user_db.id, channel_id, session)
 

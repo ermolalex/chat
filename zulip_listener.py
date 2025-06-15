@@ -42,11 +42,6 @@ def on_message(msg: dict):
             send_msg_to_bot(user_tg_id, msg['content'])
 
 
-messages = db.get_messages(session)
-if len(messages) > 0 :
-    print(f"DB accessible: {len(messages)}")
-
-
 zulip_client.call_on_each_message(on_message)
 
 

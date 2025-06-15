@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     ZULIP_EMAIL: str
     ZULIP_SITE: str
     ZULIP_ALLOW_INSECURE: bool
+    ZULIP_STAFF_IDS: list[int]
 
     RABBIT_USER: str
     RABBIT_USER_PSW: str
