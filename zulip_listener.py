@@ -33,7 +33,7 @@ def send_msg_to_bot(user_tg_id, text):
 
 
 def on_message(msg: dict):
-    print(msg)
+    logger.info(msg)
     if msg["client"] == "website":
         topic = msg["subject"]
         phone, user_tg_id = tuple(topic.split("_"))
