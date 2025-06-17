@@ -145,22 +145,36 @@ async def user_message(message: Message) -> None:
     # отправим сообщение в Zulip
     zulip_client.send_msg_to_channel(user.zulip_channel_id, user.topic_name, message.text)
 
-    # rabbit_publisher.publish(
-    #     message.text,
-    #     {
-    #         'user_name': user.first_name,
-    #         'user_phone': user.phone_number,
-    #         'user_tg_id': user.tg_id,
-    #     }
-    # )
-
     await asyncio.sleep(0)
 
 
 @user_router.message(F.photo)
 async def get_photo(message: Message):
-    destination = f"/tmp/{message.photo[-1].file_id}.jpg"
-	await message.bot.download(file=message.photo[-1].file_id, destination=destination)
+    user_tg_id = message.from_user.id
+    filter={"tg_id": user_tg_id}
+    user = db.get_user_one_or_none(filter, session)
 
-    with open(dest, "rb") as fp:
-        result = zulip_client.client.upload_file(fp)
+    if not user:
+        await message.answer(
+            "Вы еще не отправили ваш номер телефона.\n"
+            "Нажмите на кнопку ОТПРАВИТЬ ниже.",
+            reply_markup=kbs.contact_keyboard()
+        )
+        return
+
+    logger.info(f"Получено фото от пользователя {user}")
+
+    # фото сначала сохраняем на сервере бота
+    destination = f"/tmp/{message.photo[-1].file_id}.jpg"
+    await message.bot.download(file=message.photo[-1].file_id, destination=destination)
+
+    #затем отправляем на сервер zulip
+    with open(destination, "rb") as f:
+        result = zulip_client.client.upload_file(f)
+
+    #и отправим сообщение в Zulip с ссылкой на файл
+    photo_url = f"Получено [фото]({result["url"]})"
+    zulip_client.send_msg_to_channel(user.zulip_channel_id, user.topic_name, photo_url)
+
+    await asyncio.sleep(0)
+
