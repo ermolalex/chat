@@ -155,3 +155,12 @@ async def user_message(message: Message) -> None:
     # )
 
     await asyncio.sleep(0)
+
+
+@user_router.message(F.photo)
+async def get_photo(message: Message):
+    destination = f"/tmp/{message.photo[-1].file_id}.jpg"
+	await message.bot.download(file=message.photo[-1].file_id, destination=destination)
+
+    with open(dest, "rb") as fp:
+        result = zulip_client.client.upload_file(fp)
