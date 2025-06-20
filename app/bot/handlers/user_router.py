@@ -71,10 +71,7 @@ async def get_contact(message: Message):
         tg_id=contact.user_id
     )
     user_db = db.create_user(user, session)
-<<<<<<< HEAD
-=======
     logger.info(f"Получены новые контакты: {user}. Польз.добавлен в БД.")
->>>>>>> 15ae468b6f09fe9b50f3e4454c8ea072ae97f5f7
 
     msg_text = f"""Спасибо, {contact.first_name}.\n
         Ваш номер {contact.phone_number}, ваш ID {contact.user_id}.\n
@@ -94,31 +91,20 @@ async def get_contact(message: Message):
     if not user.zulip_channel_id:
         if not zulip_client.is_channel_exists(channel_name):
             # если в Zulip еще нет канала пользователя, то
-<<<<<<< HEAD
-            # - создаем канал
-            # - получаем его ID
-            # - записываем ID в свойства user-а
-            zulip_client.subscribe_to_channel(channel_name)
-=======
             # - создаем канал, и подписываем на него всех сотрудников
             # - получаем его ID
             # - записываем ID в свойства user-а
             zulip_client.subscribe_to_channel(channel_name, settings.ZULIP_STAFF_IDS)
->>>>>>> 15ae468b6f09fe9b50f3e4454c8ea072ae97f5f7
             channel_id = zulip_client.get_channel_id(channel_name)
             db.set_user_zulip_channel_id(user_db.id, channel_id, session)
 
             zulip_client.send_msg_to_channel(
                 channel_name="bot_events",
                 topic="новый подписчик",
-<<<<<<< HEAD
-                msg=f"Для пользователя {user.first_name} ({user.phone_number}) создан канал Zulip с id={channel_id}.",
-            )
-=======
                 msg=f"Для пользователя {user} создан канал Zulip с id={channel_id}.",
             )
+
             logger.info(f"Для пользователя {user} создан канал Zulip с id={channel_id}.")
->>>>>>> 15ae468b6f09fe9b50f3e4454c8ea072ae97f5f7
 
 
     await message.answer(
@@ -159,18 +145,6 @@ async def user_message(message: Message) -> None:
 
     # отправим сообщение в Zulip
     zulip_client.send_msg_to_channel(user.zulip_channel_id, user.topic_name, message.text)
-<<<<<<< HEAD
-
-    # rabbit_publisher.publish(
-    #     message.text,
-    #     {
-    #         'user_name': user.first_name,
-    #         'user_phone': user.phone_number,
-    #         'user_tg_id': user.tg_id,
-    #     }
-    # )
-=======
->>>>>>> 15ae468b6f09fe9b50f3e4454c8ea072ae97f5f7
 
     await asyncio.sleep(0)
 
@@ -200,7 +174,7 @@ async def get_photo(message: Message):
         result = zulip_client.client.upload_file(f)
 
     #и отправим сообщение в Zulip с ссылкой на файл
-    photo_url = f"Получено [фото]({result["url"]})"
+    photo_url = f"Получено [фото]({result['url']})"
     zulip_client.send_msg_to_channel(user.zulip_channel_id, user.topic_name, photo_url)
 
     await asyncio.sleep(0)
