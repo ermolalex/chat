@@ -74,8 +74,9 @@ class ZulipClient():
         channel_id = self.get_channel_id(channel_name)
         return channel_id > 0
 
-    def subscribe_to_channel(self, channel_name: str) -> int:
+    def subscribe_to_channel(self, channel_name: str, principals: [int]=[]) -> int:
         # Create and subscribe to channel.
+        # в параметр principals можно передать список [user_id] , которые будут подписаны на канал
         # {'result': 'success', 'msg': '', 'subscribed': {'8': ['канал про все']}, 'already_subscribed': {}} - если канал создали
         # {'result': 'success', 'msg': '', 'subscribed': {}, 'already_subscribed': {'8': ['Zulip']}} - если канал уже был
         # if not channel_name:
@@ -87,11 +88,17 @@ class ZulipClient():
                     "name": channel_name,
                     "description": "Описание канала",
                 },
+
             ],
+            principals=principals,
         )
 
         if result["result"] == "success":
-            logger.info(f"Пользователь подписан на канал '{channel_name}'")
+            if not principals:
+                logger.info(f"Создан канал '{channel_name}'")
+            else:
+                logger.info(f"Создан канал '{channel_name}'. Пользователи {principals} подписаны на канал.")
+
             return channel_name
         else:
             err_msg = f"Ошибка при подписании на канал '{channel_name}' - {result.get('msg', '')}"

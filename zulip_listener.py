@@ -1,11 +1,26 @@
 import sys
 import zulip
 import requests
-
+from sqlmodel import  Session
+from app.db import DB
+from app.logger import create_logger
 from app.zulip_client import ZulipClient
 from app.config import settings
 
+logger = create_logger(logger_name=__name__)
+
+db = DB()
+session = Session(db.engine)
+
 zulip_client = ZulipClient().client
+"""   !!!! Важно
+Пользователь, от лица которого создается клиент, 
+(прописан в переменных окружения ZULIP_API_KEY, ZULIP_EMAIL)
+д.б. подписан на каналы, сообщения в которых нужно перехватывать.
+=> Пользователь ТГБот д.б. подписан на все каналы.  
+"""
+# todo Пользователь ТГБот д.б. подписан на все каналы.
+# todo все сотрудники ТехОтдела д.б. подписаны на все каналы.
 
 
 def send_msg_to_bot(user_tg_id, text):
@@ -18,15 +33,15 @@ def send_msg_to_bot(user_tg_id, text):
 
 
 def on_message(msg: dict):
-    # print(msg)
-    if msg["client"] == "website" and msg["subject"][0] == "+" :   # todo  - первый символ - 7, значит это номер телефона ))
-        topik_name = msg["subject"]
-        phone, user_tg_id = tuple(topik_name.split("_"))
+    logger.info(msg)
+    if msg["client"] == "website":
+        topic = msg["subject"]
+        phone, user_tg_id = tuple(topic.split("_"))
         if user_tg_id and user_tg_id.isnumeric():
-            print(f"Сообщение в адрес {topik_name}: {msg['content']}")
+            print(f"Сообщение в адрес {topic}: {msg['content']}")
             send_msg_to_bot(user_tg_id, msg['content'])
 
-print("Zulip listener started...")
+
 zulip_client.call_on_each_message(on_message)
 
 
