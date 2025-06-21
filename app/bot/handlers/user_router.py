@@ -148,6 +148,8 @@ async def user_message(message: Message) -> None:
     await asyncio.sleep(0)
 
 
+
+
 @user_router.message(F.photo)
 async def get_photo(message: Message):
     user_tg_id = message.from_user.id
