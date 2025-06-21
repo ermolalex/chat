@@ -49,7 +49,7 @@ def on_message(msg: dict):
         subject = msg["subject"]
         user_tg_id = extract_tg_id_from_subject(subject)
         if user_tg_id and user_tg_id.isnumeric():
-            msg_text = f"{msg['sender_full_name']}: msg['content']"
+            msg_text = f"{msg['sender_full_name']}: {msg['content']}"
             send_msg_to_bot(user_tg_id, msg_text)
 
 
