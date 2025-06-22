@@ -175,7 +175,7 @@ async def get_photo(message: Message):
         result = zulip_client.client.upload_file(f)
 
     #и отправим сообщение в Zulip с ссылкой на файл
-    photo_url = f"Получено [фото]({result["url"]})"
+    photo_url = f"{message.text}\n[Фото]({result["url"]})"
     zulip_client.send_msg_to_channel(user.zulip_channel_id, user.topic_name, photo_url)
 
     await asyncio.sleep(0)
