@@ -1,4 +1,5 @@
 import sys
+import re
 import zulip
 import requests
 from sqlmodel import  Session
@@ -42,14 +43,24 @@ def extract_tg_id_from_subject(subject: str):
         send_msg_to_bot(settings.ADMIN_ID, msg_text)
         return None
 
+def clean_msg_text(raw_text: str) -> str:
+    # чистим тект сообщения
+
+    # редактируем цитирование
+    clean_text = ZulipClient.clean_quote(raw_text)
+
+    return clean_text
 
 def on_message(msg: dict):
     logger.info(msg)
     if msg["client"] == "website":
         subject = msg["subject"]
         user_tg_id = extract_tg_id_from_subject(subject)
+
         if user_tg_id and user_tg_id.isnumeric():
-            msg_text = f"{msg['sender_full_name']}: {msg['content']}"
+            msg_content = clean_msg_text(msg['content'])
+            msg_text = f"{msg['sender_full_name']}: {msg_content}"
+
             send_msg_to_bot(user_tg_id, msg_text)
 
 
