@@ -34,10 +34,11 @@ class ZulipClient():
 
     def clean_quote(text: str) -> str:
         # "грязную" цитату превращяем в "Вы писали: цитата..."
-        quote_search = re.search("```quote\n([\w\W]*)```", text)
+        quote_search = re.search("```quote\n([\w\W]*)```\n([\w\W]*)", text)
         if quote_search:
             quote = quote_search.group(1).strip()
-            return f"Вы писали: {quote}\n"
+            additiona_text = quote_search.group(2)
+            return f"Вы писали: {quote}\n{additiona_text}"
         return text
 
     def send_msg_to_channel(self, channel_name: str, topic: str, msg: str) -> str:
