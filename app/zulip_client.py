@@ -32,15 +32,6 @@ class ZulipClient():
             logger.fatal(e)
             # raise ZulipException(e)
 
-    def clean_quote(text: str) -> str:
-        # "грязную" цитату превращяем в "Вы писали: цитата..."
-        quote_search = re.search("```quote\n([\w\W]*)```\n([\w\W]*)", text)
-        if quote_search:
-            quote = quote_search.group(1).strip()
-            additiona_text = quote_search.group(2).strip()
-            return f"Вы писали: {quote}\n\n{additiona_text}"
-        return text
-
     def send_msg_to_channel(self, channel_name: str, topic: str, msg: str) -> str:
         request = {
             "type": "channel",
