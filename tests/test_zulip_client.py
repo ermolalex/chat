@@ -24,7 +24,7 @@ pong
 ТестТест
 """
 
-    clean_text = f"Вы писали: pong\n\nТестТест\n"
+    clean_text = f"Вы писали: pong\n\nТестТест"
 
     assert ZulipClient.clean_quote(raw_text) == clean_text
 
