@@ -103,7 +103,6 @@ async def get_contact(message: Message):
                 topic="новый подписчик",
                 msg=f"Для пользователя {user} создан канал Zulip с id={channel_id}.",
             )
-
             logger.info(f"Для пользователя {user} создан канал Zulip с id={channel_id}.")
 
 
@@ -149,6 +148,8 @@ async def user_message(message: Message) -> None:
     await asyncio.sleep(0)
 
 
+
+
 @user_router.message(F.photo)
 async def get_photo(message: Message):
     user_tg_id = message.from_user.id
@@ -174,7 +175,7 @@ async def get_photo(message: Message):
         result = zulip_client.client.upload_file(f)
 
     #и отправим сообщение в Zulip с ссылкой на файл
-    photo_url = f"Получено [фото]({result['url']})"
+    photo_url = f"{message.caption}\n[Фото]({result["url"]})"
     zulip_client.send_msg_to_channel(user.zulip_channel_id, user.topic_name, photo_url)
 
     await asyncio.sleep(0)
