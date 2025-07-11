@@ -54,7 +54,7 @@ def clean_msg_text(raw_text: str) -> str:
 
 def on_message(msg: dict):
     logger.info(msg)
-    if msg["client"] == "website":
+    if msg["client"] in  ("website", "ZulipMobile"):
         subject = msg["subject"]
         user_tg_id = extract_tg_id_from_subject(subject)
 
