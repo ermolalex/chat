@@ -111,6 +111,21 @@ async def get_contact(message: Message):
         reply_markup=ReplyKeyboardRemove()
     )
 
+# (F.from_user.id == 42) & (F.text == 'admin')
+# F.text.startswith('a') | F.text.endswith('b')
+@user_router.message((F.from_user.id == settings.ADMIN_ID) & F.text.startswith('/'))
+async def admin_command(message: Message) -> None:
+    """
+    админская команда
+    """
+    user_tg_id = message.from_user.id
+    text = f"Получена команда: {message.text}"
+
+    await message.answer(
+        text
+    )
+
+
 
 @user_router.message(F.text)
 async def user_message(message: Message) -> None:
@@ -148,8 +163,6 @@ async def user_message(message: Message) -> None:
     await asyncio.sleep(0)
 
 
-
-
 @user_router.message(F.photo)
 async def get_photo(message: Message):
     user_tg_id = message.from_user.id
@@ -175,7 +188,7 @@ async def get_photo(message: Message):
         result = zulip_client.client.upload_file(f)
 
     #и отправим сообщение в Zulip с ссылкой на файл
-    photo_url = f"{message.caption}\n[Фото]({result["url"]})"
+    photo_url = f"{message.caption}\n[Фото]({result['url']})"
     zulip_client.send_msg_to_channel(user.zulip_channel_id, user.topic_name, photo_url)
 
     await asyncio.sleep(0)
