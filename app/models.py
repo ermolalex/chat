@@ -46,6 +46,11 @@ class UserBase(SQLModel):
             fio += f" {self.last_name}"
         return fio
 
+    def update_from_dict(self, update_data:dict):
+        for attr_name, attr_value in update_data.items():
+            #attr = self.__getattr__(attr_name)
+            self.__setattr__(attr_name, attr_value)
+
     def __str__(self):
         return f"{self.fio}, тел:{self.phone_number}, tg_id:{self.tg_id}"
 
