@@ -121,7 +121,7 @@ async def admin_command(message: Message) -> None:
     
     todo сделать проверки try...except..
     """
-    cmd = {message.text}
+    cmd = message.text
 
     if '/list' in cmd:
         user_list = db.get_user_list(session)
