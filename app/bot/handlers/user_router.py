@@ -135,7 +135,7 @@ async def admin_command(message: Message) -> None:
     elif '/upd' in cmd:
         parts = cmd.split()
         user_id = int(parts[1])
-        update_data = json.lads(parts[2])
+        update_data = json.loads(parts[2])
         db.update_user_from_dict(user_id, update_data, session)
 
         await message.answer(
