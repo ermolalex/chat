@@ -118,11 +118,17 @@ async def admin_command(message: Message) -> None:
     """
     админская команда
     """
-    user_tg_id = message.from_user.id
-    text = f"Получена команда: {message.text}"
+    cmd = {message.text}
+
+    if cmd == '/list':
+        user_list = db.get_user_list(session)
+        list_json = ''
+        for user in user_list:
+            list_json += user.model_dump_json()
+            list_json += '\n'
 
     await message.answer(
-        text
+        list_json
     )
 
 
