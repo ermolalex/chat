@@ -106,6 +106,14 @@ class DB:
         session.commit()
         logger.info(f"Удаление всех  User'ов. (result.rowcount={result.rowcount})")
 
+    def update_user_from_dict(self, user_id:int, update_data: dict, session):
+        with session:
+            user = self.get_user_by_id(user_id, session)
+            user.update_from_dict(update_data)
+            session.add(user)
+            session.commit()
+            session.refresh(user)
+
     def set_user_zulip_channel_id(self, user_id, zulip_channel_id, session):
         with session:
             statement = select(User).where(User.id == user_id)
