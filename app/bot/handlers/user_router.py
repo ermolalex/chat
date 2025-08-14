@@ -1,4 +1,5 @@
 import sys
+import json
 import asyncio
 
 from aiogram import Router, F
@@ -117,19 +118,32 @@ async def get_contact(message: Message):
 async def admin_command(message: Message) -> None:
     """
     админская команда
+    
+    todo сделать проверки try...except..
     """
     cmd = {message.text}
 
-    if cmd == '/list':
+    if '/list' in cmd:
         user_list = db.get_user_list(session)
         list_json = ''
         for user in user_list:
             list_json += user.model_dump_json()
             list_json += '\n'
 
-    await message.answer(
-        list_json
-    )
+        await message.answer(list_json)
+
+    elif '/upd' in cmd:
+        parts = cmd.split()
+        user_id = int(parts[1])
+        update_data = json.lads(parts[2])
+        db.update_user_from_dict(user_id, update_data, session)
+
+        await message.answer(
+            db.get_user_by_id(user_id, session)
+        )
+    
+    else:
+        await message.answer(f"Неопознанная команда: {cmd}")
 
 
 
