@@ -138,9 +138,7 @@ async def admin_command(message: Message) -> None:
         update_data = json.loads(parts[2])
         db.update_user_from_dict(user_id, update_data, session)
 
-        await message.answer(
-            db.get_user_by_id(user_id, session)
-        )
+        await message.answer(f"Запись пользователя {user_id} изменена")
     
     else:
         await message.answer(f"Неопознанная команда: {cmd}")
