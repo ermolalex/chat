@@ -42,6 +42,18 @@ class DB:
             user_db = None
         return user_db
 
+    def get_user_list(self, session: Session) -> list[User]:
+        logger.info(f"Get User list from DB")
+        statement = select(User)
+        result = session.exec(statement)
+        user_list: list[User] = result.all()
+        if user_list:
+            return user_list
+        else:
+            logger.error("User list is empty")
+            raise UserNotFound("User list is empty")
+
+    
     def get_user_by_id(self, user_id: int, session: Session) -> User:
         logger.info(f"Get User with ID {user_id} from DB")
         statement = select(User).where(User.id == user_id)
