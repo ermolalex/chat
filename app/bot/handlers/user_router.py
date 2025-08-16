@@ -73,7 +73,8 @@ async def cmd_start_with_param(message: Message, command: CommandObject):
     logger.info(f"Обрабатываем команду /start от пользователя с id={user_id}")
 
     if command.args:
-        payload = decode_payload(command.args)
+        # payload = decode_payload(command.args)
+        payload = command.args
         send_bot_event_msg_to_zulip(f"Cmd /start with param: {payload}")
 
     await message.answer(get_about_us_text(), reply_markup=kbs.contact_keyboard())
