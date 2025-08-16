@@ -132,7 +132,7 @@ async def get_contact(message: Message):
 
 # (F.from_user.id == 42) & (F.text == 'admin')
 # F.text.startswith('a') | F.text.endswith('b')
-@user_router.message((F.from_user.id == settings.ADMIN_ID) & F.text.startswith('/'))
+@user_router.message((F.from_user.id == settings.ADMIN_ID) & F.text.startswith('//'))
 async def admin_command(message: Message) -> None:
     """
     админская команда
