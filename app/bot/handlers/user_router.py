@@ -85,14 +85,18 @@ async def cmd_start(message: Message) -> None:
 async def get_contact(message: Message):
     contact = message.contact
 
-    user = UserBase(
-        first_name=contact.first_name,
-        last_name=contact.last_name,
-        phone_number=contact.phone_number,
-        tg_id=contact.user_id
-    )
-    user_db = db.create_user(user, session)
-    logger.info(f"Получены новые контакты: {user}. Польз.добавлен в БД.")
+    # клиент мог повторно отправить контакты, поэтому сначала ищем его в БД
+    user = db.get_user_one_or_none({"tg_id": contact.user_id})
+
+    if not user:
+        user = UserBase(
+            first_name=contact.first_name,
+            last_name=contact.last_name,
+            phone_number=contact.phone_number,
+            tg_id=contact.user_id
+        )
+        user = db.create_user(user, session)
+        logger.info(f"Получены новые контакты: {user}. Польз.добавлен в БД.")
 
     msg_text = f"""Спасибо, {contact.first_name}.\n
         Ваш номер {contact.phone_number}, ваш ID {contact.user_id}.\n
@@ -117,7 +121,7 @@ async def get_contact(message: Message):
             # - записываем ID в свойства user-а
             zulip_client.subscribe_to_channel(channel_name, settings.ZULIP_STAFF_IDS)
             channel_id = zulip_client.get_channel_id(channel_name)
-            db.set_user_zulip_channel_id(user_db.id, channel_id, session)
+            db.set_user_zulip_channel_id(user.id, channel_id, session)
 
             zulip_client.send_msg_to_channel(
                 channel_name="bot_events",
