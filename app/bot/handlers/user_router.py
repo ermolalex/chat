@@ -86,7 +86,8 @@ async def get_contact(message: Message):
     contact = message.contact
 
     # клиент мог повторно отправить контакты, поэтому сначала ищем его в БД
-    user = db.get_user_one_or_none({"tg_id": contact.user_id})
+    user_filter = {"tg_id": contact.user_id}
+    user = db.get_user_one_or_none(user_filter, session)
 
     if not user:
         user = UserBase(
