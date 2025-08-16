@@ -66,18 +66,19 @@ async def cmd_start(message: Message) -> None:
     """
     await message.answer(get_about_us_text(), reply_markup=kbs.contact_keyboard())
 
-
-@user_router.message(CommandStart(deep_link=True))
-async def cmd_start_with_param(message: Message, command: CommandObject):
-    user_id = message.from_user.id
-    logger.info(f"Обрабатываем команду /start от пользователя с id={user_id}")
-
-    if command.args:
-        # payload = decode_payload(command.args)
-        payload = command.args
-        send_bot_event_msg_to_zulip(f"Cmd /start with param: {payload}")
-
-    await message.answer(get_about_us_text(), reply_markup=kbs.contact_keyboard())
+# команда с доп.параметром  https://ru.stackoverflow.com/questions/1555324/
+# в параметре можно передать, напр., ИД клиента
+# @user_router.message(CommandStart(deep_link=True))
+# async def cmd_start_with_param(message: Message, command: CommandObject):
+#     user_id = message.from_user.id
+#     logger.info(f"Обрабатываем команду /start от пользователя с id={user_id}")
+#
+#     if command.args:
+#         # payload = decode_payload(command.args)
+#         payload = command.args
+#         send_bot_event_msg_to_zulip(f"Cmd /start with param: {payload}")
+#
+#     await message.answer(get_about_us_text(), reply_markup=kbs.contact_keyboard())
 
 
 @user_router.message(F.contact)
