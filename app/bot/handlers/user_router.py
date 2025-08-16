@@ -124,13 +124,16 @@ async def admin_command(message: Message) -> None:
     cmd = message.text
 
     if '/list' in cmd:
+        logger.info('Получена команда /list')
         user_list = db.get_user_list(session)
         list_json = ''
+
         for user in user_list:
             list_json += user.model_dump_json()
             list_json += '\n'
 
         await message.answer(list_json)
+        logger.info('Команда /list обработана')
 
     elif '/upd' in cmd:
         parts = cmd.split()
