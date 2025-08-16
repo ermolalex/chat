@@ -3,8 +3,9 @@ import json
 import asyncio
 
 from aiogram import Router, F
-from aiogram.filters import CommandStart, Command
+from aiogram.filters import CommandStart, Command, CommandObject
 from aiogram.types import Message, ReplyKeyboardRemove, ContentType
+from aiogram.utils.deep_linking import decode_payload
 from sqlmodel import  Session
 
 from app.bot.keyboards import kbs
@@ -31,7 +32,13 @@ except ZulipException:
     sys.exit(msg)
 
 
-#rabbit_publisher = RabbitPublisher()
+def send_bot_event_msg_to_zulip(msg_text:str, topic='info'):
+    zulip_client.send_msg_to_channel(
+        channel_name="bot_events",
+        topic=topic,
+        msg=msg_text
+    )
+
 
 @user_router.message(Command("contact"))
 async def share_number(message: Message):
@@ -41,27 +48,38 @@ async def share_number(message: Message):
     )
 
 
-@user_router.message(CommandStart())
-async def cmd_start(message: Message) -> None:
+# @user_router.message(CommandStart())
+# async def cmd_start(message: Message) -> None:
+#     user_id = message.from_user.id
+#     logger.info(f"Обрабатываем команду /start от пользователя с id={user_id}")
+#     """
+#     Обрабатывает команду /start.
+#     user = await UserDAO.find_one_or_none(telegram_id=message.from_user.id)
+#
+#     if not user:
+#         await UserDAO.add(
+#             telegram_id=message.from_user.id,
+#             first_name=message.from_user.first_name,
+#             username=message.from_user.username
+#         )
+#
+#     """
+#     await message.answer(get_about_us_text(), reply_markup=kbs.contact_keyboard())
+
+
+@user_router.message(CommandStart(deep_link=True))
+async def cmd_start_with_param(message: Message, command: CommandObject):
     user_id = message.from_user.id
     logger.info(f"Обрабатываем команду /start от пользователя с id={user_id}")
-    """
-    Обрабатывает команду /start.
-    user = await UserDAO.find_one_or_none(telegram_id=message.from_user.id)
 
-    if not user:
-        await UserDAO.add(
-            telegram_id=message.from_user.id,
-            first_name=message.from_user.first_name,
-            username=message.from_user.username
-        )
+    if command.args:
+        payload = decode_payload(command.args)
+        send_bot_event_msg_to_zulip(f"Cmd /start with param: {payload}")
 
-    """
     await message.answer(get_about_us_text(), reply_markup=kbs.contact_keyboard())
-    # await greet_user(message) #, is_new_user=not user)
 
 
-@user_router.message(F.contact) #ContentType.CONTACT) #content_types=ContentType.CONTACT)
+@user_router.message(F.contact)
 async def get_contact(message: Message):
     contact = message.contact
 
