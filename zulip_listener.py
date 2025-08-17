@@ -40,7 +40,7 @@ def uploaded_file_name(msg_text: str) -> str:
 
 def description_text(msg_text: str) -> str:
     pattern = r'(\(\/.+\))'
-    substr = re.sub(pat, '', text)
+    substr = re.sub(pattern, '', msg_text)
     return substr
 
 
