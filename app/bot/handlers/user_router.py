@@ -178,6 +178,7 @@ async def user_message(message: Message) -> None:
     """
     By default, message handler will handle all message types (like a text, photo, sticker etc.)
     """
+
     user_tg_id = message.from_user.id
     filter={"tg_id": user_tg_id}
     user = db.get_user_one_or_none(filter, session)
@@ -191,20 +192,14 @@ async def user_message(message: Message) -> None:
         return
 
     logger.info(f"Получено сообщение от бота {message.text} от пользователя {user}")
-    # if not user.activated:
-    #     await message.answer("Учетка не активирована")
-    #     return
 
-    # # сохраним сообщение в БД todo
-    # tg_message = TgUserMessageBase(
-    #     from_u_id=user.id,
-    #     from_u_tg_id=user.tg_id,
-    #     text=message.text
-    # )
-    # db.add_tg_message(tg_message, session)
+    topic_name = user.topic_name
+    chat_type = message.chat.type
+    if 'group' in chat_type:  # сообщение отправлено из группы
+        topic_name = f"Группа {message.chat.id}"
 
     # отправим сообщение в Zulip
-    zulip_client.send_msg_to_channel(user.zulip_channel_id, user.topic_name, message.text)
+    zulip_client.send_msg_to_channel(user.zulip_channel_id, topic_name, message.text)
 
     await asyncio.sleep(0)
 
