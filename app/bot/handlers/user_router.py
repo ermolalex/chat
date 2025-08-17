@@ -222,9 +222,17 @@ async def get_photo(message: Message):
 
     logger.info(f"Получено фото от пользователя {user}")
 
+    largest_photo = message.photo[-1]
+    if largest_photo.file_size > 20 * 1024:
+        await message.answer(
+            "Очень большой размер фото.\n"
+            "Макс допустимый размер - 20МБ."
+        )
+        return
+
     # фото сначала сохраняем на сервере бота
-    destination = f"/tmp/{message.photo[-1].file_id}.jpg"
-    await message.bot.download(file=message.photo[-1].file_id, destination=destination)
+    destination = f"/tmp/{largest_photo.file_id}.jpg"
+    await message.bot.download(file=largest_photo.file_id, destination=destination)
 
     #затем отправляем на сервер zulip
     with open(destination, "rb") as f:
