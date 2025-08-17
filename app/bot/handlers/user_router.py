@@ -48,23 +48,23 @@ async def share_number(message: Message):
     )
 
 
-# @user_router.message(CommandStart())
-# async def cmd_start(message: Message) -> None:
-#     user_id = message.from_user.id
-#     logger.info(f"Обрабатываем команду /start от пользователя с id={user_id}")
-#     """
-#     Обрабатывает команду /start.
-#     user = await UserDAO.find_one_or_none(telegram_id=message.from_user.id)
-#
-#     if not user:
-#         await UserDAO.add(
-#             telegram_id=message.from_user.id,
-#             first_name=message.from_user.first_name,
-#             username=message.from_user.username
-#         )
-#
-#     """
-#     await message.answer(get_about_us_text(), reply_markup=kbs.contact_keyboard())
+@user_router.message(CommandStart())
+async def cmd_start(message: Message) -> None:
+    user_id = message.from_user.id
+    logger.info(f"Обрабатываем команду /start от пользователя с id={user_id}")
+    """
+    Обрабатывает команду /start.
+    user = await UserDAO.find_one_or_none(telegram_id=message.from_user.id)
+
+    if not user:
+        await UserDAO.add(
+            telegram_id=message.from_user.id,
+            first_name=message.from_user.first_name,
+            username=message.from_user.username
+        )
+
+    """
+    await message.answer(get_about_us_text(), reply_markup=kbs.contact_keyboard())
 
 # команда с доп.параметром  https://ru.stackoverflow.com/questions/1555324/
 # в параметре можно передать, напр., ИД клиента
