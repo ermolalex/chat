@@ -51,10 +51,12 @@ def clean_quote(text: str) -> str:
     return res
 
 
-
-
-
-
+def is_int_string(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
 
 
 def clean_quote2(text: str) -> str:

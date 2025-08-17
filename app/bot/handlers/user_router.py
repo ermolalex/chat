@@ -193,13 +193,15 @@ async def user_message(message: Message) -> None:
 
     logger.info(f"Получено сообщение от бота {message.text} от пользователя {user}")
 
-    topic_name = user.topic_name
     chat_type = message.chat.type
+    topic_name = user.topic_name
+    message_text = message.text
     if 'group' in chat_type:  # сообщение отправлено из группы
-        topic_name = f"Группа {message.chat.id}"
+        topic_name = f"Группа_{message.chat.id}"
+        message_text = f"{user.fio}: {message_text}"
 
     # отправим сообщение в Zulip
-    zulip_client.send_msg_to_channel(user.zulip_channel_id, topic_name, message.text)
+    zulip_client.send_msg_to_channel(user.zulip_channel_id, topic_name, message_text)
 
     await asyncio.sleep(0)
 

@@ -58,7 +58,7 @@ def on_message(msg: dict):
         subject = msg["subject"]
         user_tg_id = extract_tg_id_from_subject(subject)
 
-        if user_tg_id and user_tg_id.isnumeric():
+        if user_tg_id and helpers.is_int_string(user_tg_id):
             msg_content = clean_msg_text(msg['content'])
             msg_text = f"{msg['sender_full_name']}: {msg_content}"
 
