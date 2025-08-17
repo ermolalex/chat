@@ -55,21 +55,22 @@ def send_photo_to_bot(user_tg_id: int, file_name: str):
     print(results.json())
 
 
-def send_msg_to_bot(user_tg_id, text):
+def send_msg_to_bot(user_tg_id, zulip_text):
     # # https://api.telegram.org/bot<Bot_token>/sendMessage?chat_id=<chat_id>&text=Привет%20мир
     token = settings.BOT_TOKEN
     chat_id = str(user_tg_id)
-    msg_text = text
+    tgbot_text = zulip_text
 
-    if '/user_uploads/' in text:  # отправляется файл
-        file_name = uploaded_file_name(text)
-        msg_text = description_text(text)
+    if '/user_uploads/' in zulip_text:  # отправляется файл
+        file_name = uploaded_file_name(zulip_text)
+        tgbot_text = description_text(zulip_text)
+        logger.info(f"Sending photo from file {file_name}, descr: {tgbot_text}")
         if file_name:
             send_photo_to_bot(user_tg_id)
         else:
-            msg_text += "\nНе удалось отправить картинку..."
+            tgbot_text += "\nНе удалось отправить картинку..."
 
-    url = f"https://api.telegram.org/bot{token}/sendMessage?chat_id={chat_id}&text={msg_text}"
+    url = f"https://api.telegram.org/bot{token}/sendMessage?chat_id={chat_id}&text={tgbot_text}"
     results = requests.get(url)
     print(results.json())
 
