@@ -24,13 +24,53 @@ zulip_client = ZulipClient().client
 # todo Пользователь ТГБот д.б. подписан на все каналы.
 # todo все сотрудники ТехОтдела д.б. подписаны на все каналы.
 
+"""
+'[Снимок экрана от 2025-07-10 17-48-37.png](/user_uploads/2/4c/vQfELySoD1xFWvxK7lPBz6Yv/2025-07-10-17-48-37.png)  \nи еще и еще'
+из этой строки выделяем 1)имя файла - все что в скобках 2)остальной текст 
+"""
+def uploaded_file_name(msg_text: str) -> str:
+    pattern = r'[^(]+(\(\/.+\)).+'
+
+    matches = re.match(pattern, msg_text)
+    if matches:
+        file_name = matches.group(1)[1:-1]
+        return file_name
+    else:
+        return ''
+
+def description_text(msg_text: str) -> str:
+    pattern = r'(\(\/.+\))'
+    substr = re.sub(pat, '', text)
+    return substr
+
+
+def send_photo_to_bot(user_tg_id: int, file_name: str):
+    token = settings.BOT_TOKEN
+    chat_id = str(user_tg_id)
+
+    url = f"https://api.telegram.org/bot{token}/sendPhoto"
+    files = {'photo': open(file_name, 'rb')}
+    data = {'chat_id' : chat_id}
+    result = requests.post(url, files=files, data=data)
+    print(results.json())
+
 
 def send_msg_to_bot(user_tg_id, text):
     # # https://api.telegram.org/bot<Bot_token>/sendMessage?chat_id=<chat_id>&text=Привет%20мир
     token = settings.BOT_TOKEN
     chat_id = str(user_tg_id)
-    url_req = "https://api.telegram.org/bot" + token + "/sendMessage" + "?chat_id=" + chat_id + "&text=" + text
-    results = requests.get(url_req)
+    msg_text = text
+
+    if '/user_uploads/' in text:  # отправляется файл
+        file_name = uploaded_file_name(text)
+        msg_text = description_text(text)
+        if file_name:
+            send_photo_to_bot(user_tg_id)
+        else:
+            msg_text += "\nНе удалось отправить картинку..."
+
+    url = f"https://api.telegram.org/bot{token}/sendMessage?chat_id={chat_id}&text={msg_text}"
+    results = requests.get(url)
     print(results.json())
 
 
@@ -84,3 +124,13 @@ zulip_client.call_on_each_message(on_message)
 #
 # {'ok': True, 'result': {'message_id': 481, 'from': {'id': 7586848030, 'is_bot': True, 'first_name': 'kik-test-bot', 'username': 'kik_soft_supp_bot'},
 # 'chat': {'id': 542393918, 'first_name': 'Александр', 'type': 'private'}, 'date': 1744282106, 'text': 'решение 6'}}
+
+# от Zulip с картинкой
+# {'id': 835, 'sender_id': 8,
+# 'content': '[Снимок экрана от 2025-04-04 23-08-25.png](/user_uploads/2/c6/IF2RKikfklKeiJ9kSDMcBlWs/2025-04-04-23-08-25.png)',
+# 'recipient_id': 13, 'timestamp': 1755448700, 'client': 'website', 'subject': 'Александр_542393918', 'topic_links': [],
+# 'is_me_message': False, 'reactions': [], 'submessages': [], 'sender_full_name': 'Александр', 'sender_email': 'alex@kik-soft.ru',
+# 'sender_realm_str': '', 'display_recipient': 'КиК-софт', 'type': 'stream', 'stream_id': 4, 'avatar_url': None,
+# 'content_type': 'text/x-markdown'}
+
+# картинка  'content': '[Снимок экрана от 2025-07-10 17-48-37.png](/user_uploads/2/4c/vQfELySoD1xFWvxK7lPBz6Yv/2025-07-10-17-48-37.png)  и еще текст\nи еще текст'
