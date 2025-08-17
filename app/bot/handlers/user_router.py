@@ -5,7 +5,7 @@ import asyncio
 from aiogram import Router, F
 from aiogram.filters import CommandStart, Command, CommandObject
 from aiogram.types import Message, ReplyKeyboardRemove, ContentType
-from aiogram.utils.deep_linking import decode_payload
+
 from sqlmodel import  Session
 
 from app.bot.keyboards import kbs
@@ -47,6 +47,20 @@ async def share_number(message: Message):
         reply_markup=await kbs.contact_keyboard()
     )
 
+# команда /start с доп.параметром  https://ru.stackoverflow.com/questions/1555324/
+# в параметре можно передать, напр., ИД клиента
+@user_router.message(CommandStart(deep_link=True))
+async def cmd_start_with_param(message: Message, command: CommandObject):
+    from_user = message.from_user
+    logger.info(f"Обрабатываем команду /start от пользователя {from_user}")
+
+    if command.args:
+        # payload = decode_payload(command.args)
+        payload = command.args
+        send_bot_event_msg_to_zulip(f"/start {from_user}, {payload}")
+
+    await message.answer(get_about_us_text(), reply_markup=kbs.contact_keyboard())
+
 
 @user_router.message(CommandStart())
 async def cmd_start(message: Message) -> None:
@@ -64,20 +78,6 @@ async def cmd_start(message: Message) -> None:
         )
 
     """
-    await message.answer(get_about_us_text(), reply_markup=kbs.contact_keyboard())
-
-# команда с доп.параметром  https://ru.stackoverflow.com/questions/1555324/
-# в параметре можно передать, напр., ИД клиента
-@user_router.message(CommandStart(deep_link=True))
-async def cmd_start_with_param(message: Message, command: CommandObject):
-    user_id = message.from_user.id
-    logger.info(f"Обрабатываем команду /start от пользователя с id={user_id}")
-
-    if command.args:
-        # payload = decode_payload(command.args)
-        payload = command.args
-        send_bot_event_msg_to_zulip(f"/start {payload}")
-
     await message.answer(get_about_us_text(), reply_markup=kbs.contact_keyboard())
 
 
