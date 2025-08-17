@@ -223,7 +223,7 @@ async def get_photo(message: Message):
     logger.info(f"Получено фото от пользователя {user}")
 
     largest_photo = message.photo[-1]
-    if largest_photo.file_size > 20 * 1024:
+    if largest_photo.file_size > settings.MAX_FILE_SIZE * 1024 * 1024:
         await message.answer(
             "Очень большой размер фото.\n"
             "Макс допустимый размер - 20МБ."

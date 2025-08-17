@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     ZULIP_ALLOW_INSECURE: bool
     ZULIP_STAFF_IDS: list[int]
 
+    MAX_FILE_SIZE: int # in MBytes
+
     RABBIT_USER: str
     RABBIT_USER_PSW: str
 
