@@ -31,9 +31,11 @@ zulip_client = ZulipClient().client
 def uploaded_file_name(msg_text: str) -> str:
     pattern = r'[^(]+(\(\/.+\)).+'
 
+    logger.info(f"***msg_text='{msg_text}'")
     matches = re.match(pattern, msg_text)
     if matches:
         file_name = matches.group(1)[1:-1]
+        logger.info(f"***file_name='{file_name}'")
         return file_name
     else:
         return ''
