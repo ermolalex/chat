@@ -67,9 +67,10 @@ def send_msg_to_bot(user_tg_id, zulip_text):
         file_name = uploaded_file_name(zulip_text)
         tgbot_text = description_text(zulip_text)
         logger.info(f"Sending photo from file {file_name}, descr: {tgbot_text}")
-        if file_name:
+        try:
             send_photo_to_bot(user_tg_id, file_name)
-        else:
+        except FileNotFoundError:
+            logger.error(f"Не найден файл по пути '{file_name}'")
             tgbot_text += "\nНе удалось отправить картинку..."
 
     url = f"https://api.telegram.org/bot{token}/sendMessage?chat_id={chat_id}&text={tgbot_text}"
