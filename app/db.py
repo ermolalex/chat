@@ -3,7 +3,7 @@ from typing import List
 from datetime import datetime, timezone
 from sqlalchemy import exc
 from sqlmodel import SQLModel, create_engine, Session, select, delete
-from app.models import UserBase, User, TgUserMessageBase, TgUserMessage
+from app.models import UserBase, User #, TgUserMessageBase, TgUserMessage
 from app.exceptions import UserNotFound, UserPhoneNumberAlreadyExists
 from app.logger import create_logger
 
@@ -136,21 +136,21 @@ class DB:
             session.commit()
             session.refresh(user)
 
-    def add_tg_message(self, message: TgUserMessageBase, session: Session):
-        message_db = TgUserMessage.from_orm(message)
-        try:
-            session.add(message_db)
-            session.commit()
-            session.refresh(message_db)
-            logger.info(f"Добавлено сообщение от {message_db.user.first_name}: {message_db.text[:20]}...")
-        except Exception as e:
-            logger.info(f"Ошибка при сохранения сообщения {message_db}...")
-            session.rollback()
-            raise
-        return #user_db
-
-    def get_messages(self, session: Session) -> List[TgUserMessage]:
-        logger.info("Читаем все сообщения из БД")
-        statement = select(TgUserMessage)
-        results = session.exec(statement)
-        return [r for r in results]
+    # def add_tg_message(self, message: TgUserMessageBase, session: Session):
+    #     message_db = TgUserMessage.from_orm(message)
+    #     try:
+    #         session.add(message_db)
+    #         session.commit()
+    #         session.refresh(message_db)
+    #         logger.info(f"Добавлено сообщение от {message_db.user.first_name}: {message_db.text[:20]}...")
+    #     except Exception as e:
+    #         logger.info(f"Ошибка при сохранения сообщения {message_db}...")
+    #         session.rollback()
+    #         raise
+    #     return #user_db
+    #
+    # def get_messages(self, session: Session) -> List[TgUserMessage]:
+    #     logger.info("Читаем все сообщения из БД")
+    #     statement = select(TgUserMessage)
+    #     results = session.exec(statement)
+    #     return [r for r in results]

@@ -10,7 +10,7 @@ from sqlmodel import  Session
 
 from app.bot.keyboards import kbs
 from app.bot.utils.utils import greet_user, get_about_us_text
-from app.models import User, UserBase, TgUserMessageBase
+from app.models import User, UserBase #, TgUserMessageBase
 from app.zulip_client import ZulipClient, ZulipException
 #from app.bot.utils.rabbit_publisher import RabbitPublisher
 from app.config import settings
@@ -195,13 +195,13 @@ async def user_message(message: Message) -> None:
     #     await message.answer("Учетка не активирована")
     #     return
 
-    # сохраним сообщение в БД todo
-    tg_message = TgUserMessageBase(
-        from_u_id=user.id,
-        from_u_tg_id=user.tg_id,
-        text=message.text
-    )
-    db.add_tg_message(tg_message, session)
+    # # сохраним сообщение в БД todo
+    # tg_message = TgUserMessageBase(
+    #     from_u_id=user.id,
+    #     from_u_tg_id=user.tg_id,
+    #     text=message.text
+    # )
+    # db.add_tg_message(tg_message, session)
 
     # отправим сообщение в Zulip
     zulip_client.send_msg_to_channel(user.zulip_channel_id, user.topic_name, message.text)
