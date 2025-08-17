@@ -29,7 +29,7 @@ zulip_client = ZulipClient().client
 из этой строки выделяем 1)имя файла - все что в скобках 2)остальной текст 
 """
 def uploaded_file_name(msg_text: str) -> str:
-    pattern = r'[^(]+(\(\/.+\)).+'
+    pattern = r'[^(]+(\(\/.+\))'
 
     logger.info(f"***msg_text='{msg_text}'")
     matches = re.match(pattern, msg_text)
