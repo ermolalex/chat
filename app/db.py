@@ -55,14 +55,15 @@ class DB:
 
     
     def get_user_by_id(self, user_id: int, session: Session) -> User:
-        logger.info(f"Get User with ID {user_id} from DB")
+        logger.info(f"Get User with ID {user_id}")
         statement = select(User).where(User.id == user_id)
         result: User = session.exec(statement).one_or_none()
-        if result:
-            return result
-        else:
-            logger.error("User not found")
-            raise UserNotFound(f"Не найден User с id {user_id}")
+
+        if not result:
+            logger.warning(f"User with ID {user_id} not found")
+            #raise UserNotFound(f"Не найден User с id {user_id}")
+
+        return result
 
     def get_user_one_or_none(self, filter: dict, session: Session):
         logger.info(f"Поиск Пользователя по фильтру: {filter}")
@@ -98,6 +99,17 @@ class DB:
         else:
             logger.error("User not found")
             raise UserNotFound(f"Не найден User с номером телефона {phone_number}")
+
+    def delete_user(self, id: int, session: Session):
+        with session:
+            user = self.get_user_by_id(id, session)
+            user_str = str(user)
+            if not user:
+                return None
+            session.delete(user)
+            session.commit()
+        logger.info(f"Удалили User'а с id={id}")
+        return user_str
 
     def delete_all_users(self, session: Session):
         logger.info(f"Удаление всех  User'ов")

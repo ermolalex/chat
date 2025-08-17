@@ -158,7 +158,16 @@ async def admin_command(message: Message) -> None:
         db.update_user_from_dict(user_id, update_data, session)
 
         await message.answer(f"Запись пользователя {user_id} изменена")
-    
+
+    elif '/del' in cmd:
+        parts = cmd.split()
+        user_id = int(parts[1])
+        user_str = db.delete_user(user_id, session)
+        if user_str:
+            await message.answer(f"{user_str} удален")
+        else:
+            await message.answer(f"Пользователь с id={user_id} не найден.")
+
     else:
         await message.answer(f"Неопознанная команда: {cmd}")
 
