@@ -148,7 +148,12 @@ async def admin_command(message: Message) -> None:
             list_json += user.model_dump_json()
             list_json += '\n'
 
-        await message.answer(list_json)
+        zulip_client.send_msg_to_channel(
+            channel_name="bot_events",
+            topic="ответы на команды",
+            msg=list_json,
+        )
+        await message.answer('Команда /list обработана')
         logger.info('Команда /list обработана')
 
     elif '/upd' in cmd:

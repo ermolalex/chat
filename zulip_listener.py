@@ -14,7 +14,8 @@ logger = create_logger(logger_name=__name__)
 db = DB()
 session = Session(db.engine)
 
-zulip_client = ZulipClient().client
+zulip = ZulipClient()
+zulip_client = zulip.client  # todo - исправить
 """   !!!! Важно
 Пользователь, от лица которого создается клиент, 
 (прописан в переменных окружения ZULIP_API_KEY, ZULIP_EMAIL)
@@ -54,7 +55,7 @@ def send_photo_to_bot(user_tg_id: int, file_name: str):
     files = {'photo': open(file_name, 'rb')}
     data = {'chat_id' : chat_id}
     result = requests.post(url, files=files, data=data)
-    print(results.json())
+    print(result.json())
 
 
 def send_msg_to_bot(user_tg_id, zulip_text):
@@ -74,8 +75,8 @@ def send_msg_to_bot(user_tg_id, zulip_text):
             tgbot_text += "\nНе удалось отправить картинку..."
 
     url = f"https://api.telegram.org/bot{token}/sendMessage?chat_id={chat_id}&text={tgbot_text}"
-    results = requests.get(url)
-    print(results.json())
+    result = requests.get(url)
+    print(result.json())
 
 
 def extract_tg_id_from_subject(subject: str):
@@ -96,17 +97,32 @@ def clean_msg_text(raw_text: str) -> str:
 
     return clean_text
 
+def handle_command(cmd: str):
+    zulip.send_msg_to_channel(
+        channel_name="bot_events",
+        topic="ответы на команды",
+        msg=f"Получена команда: {cmd}",
+    )
+
 def on_message(msg: dict):
     logger.info(msg)
     if msg["client"] in  ("website", "ZulipMobile"):
         subject = msg["subject"]
         user_tg_id = extract_tg_id_from_subject(subject)
 
-        if user_tg_id and helpers.is_int_string(user_tg_id):
-            msg_content = clean_msg_text(msg['content'])
-            msg_text = f"{msg['sender_full_name']}: {msg_content}"
+        if not (user_tg_id and helpers.is_int_string(user_tg_id)):
+            logger.warning(f"Неккоректный user_tg_id: '{user_tg_id}'")
+            return
 
-            send_msg_to_bot(user_tg_id, msg_text)
+        msg_content = clean_msg_text(msg['content'])
+
+        if int(user_tg_id) == int(settings.ADMIN_ID) and '//' in msg_content:  # какая-то админская команда
+            handle_command(msg_content)
+            return
+
+        msg_text = f"{msg['sender_full_name']}: {msg_content}"
+
+        send_msg_to_bot(user_tg_id, msg_text)
 
 
 zulip_client.call_on_each_message(on_message)
