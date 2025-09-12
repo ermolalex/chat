@@ -89,6 +89,17 @@ class DB:
             logger.error(f"Ошибка при поиске Пользователя по фильтрам {filter}: {e}")
             raise
 
+    def get_40_users_from_id(self, from_id: int, session: Session):
+        logger.info(f"Получить 40 полльзователей начиная с номера: {from_id}")
+        statement = select(User).where(User.id > from_id)
+        try:
+            result: list[User] = session.exec(statement).all()
+            return result
+        except exc.SQLAlchemyError as e:
+            logger.error(f"Ошибка при получении списка пользователей: {e}")
+            raise
+
+
 
     def get_user_by_phone_number(self, phone_number: str, session: Session) -> User:
         logger.info(f"Get User by phone_number {phone_number}")

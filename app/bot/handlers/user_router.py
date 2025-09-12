@@ -138,10 +138,16 @@ async def admin_command(message: Message) -> None:
     todo сделать проверки try...except..
     """
     cmd = message.text
+    logger.info(f'Получена команда {cmd}')
 
     if '/list' in cmd:
-        logger.info('Получена команда /list')
-        user_list = db.get_user_list(session)
+        parts = cmd.split()
+        try:
+            from_id = int(parts[1])
+        except IndexError:
+            from_id = 0
+
+        user_list = db.get_40_users_from_id(from_id, session)
         list_json = ''
 
         for user in user_list:
