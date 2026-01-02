@@ -104,3 +104,35 @@ class User(UserBase, table=True):
 #
 # class Vocab(SQLModel, table=True):
 #     word: str = Field(primary_key=True)
+
+
+"""  Согласие на обработку ПД
+from aiogram import types
+from aiogram.dispatcher import FSMContext
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+# ... (импорт и инициализация бота)
+
+async def cmd_start(message: types.Message, state: FSMContext):
+    keyboard = InlineKeyboardMarkup()
+    agree_button = InlineKeyboardButton(text="Согласен", callback_data="agree_pdn")
+    disagree_button = InlineKeyboardButton(text="Отказаться", callback_data="disagree_pdn")
+    keyboard.add(agree_button, disagree_button)
+    
+    await message.answer(
+        "Привет! Я бот [Название]. Для продолжения работы мне нужно ваше согласие на обработку персональных данных. Подробнее в <a href='ссылка_на_политику'>Политике конфиденциальности</a>.",
+        reply_markup=keyboard,
+        parse_mode='HTML'
+    )
+
+async def process_callback_pdn(callback_query: types.CallbackQuery, state: FSMContext):
+    if callback_query.data == "agree_pdn":
+        user_id = callback_query.from_user.id
+        # Сохраняем факт согласия в БД
+        # await save_user_consent(user_id) 
+        await callback_query.message.answer("Спасибо! Вы дали согласие. Теперь вы можете пользоваться ботом.")
+        await state.finish() # Или переход в другое состояние
+    elif callback_query.data == "disagree_pdn":
+        await callback_query.message.answer("Вы отказались от обработки ПДн. Бот не сможет продолжить работу.")
+        await callback_query.message.delete() # Удаляем кнопки
+"""

@@ -75,33 +75,42 @@ async def cmd_start(message: Message) -> None:
 @user_router.message(F.contact)
 async def get_contact(message: Message):
     contact = message.contact
+    """
+    The Contact object has the following structure and attributes: 
+    phone_number	str	Contact's phone number.
+    first_name	str	Contact's first name.
+    last_name	str	Optional. Contact's last name.
+    user_id	int	Optional. Contact's user identifier in Telegram.
+    vcard	str	Optional. Additional data about the contact in the form of a vCard."""
 
     # клиент мог повторно отправить контакты, поэтому сначала ищем его в БД
     user_filter = {"tg_id": contact.user_id}
     user = db.get_user_one_or_none(user_filter, session)
 
     if not user:
-        user = UserBase(
+        new_user = UserBase(
             first_name=contact.first_name,
             last_name=contact.last_name,
             phone_number=contact.phone_number,
             tg_id=contact.user_id
         )
-        user = db.create_user(user, session)
+        user = db.create_user(new_user, session)
         logger.info(f"Получены новые контакты: {user}. Польз.добавлен в БД.")
 
-    msg_text = f"""Спасибо, {contact.first_name}.\n
-        Ваш номер {contact.phone_number}, ваш ID {contact.user_id}.\n
-        Теперь вы можете написать нам о своей проблеме."""
+    zulip_msg_text = f"""Подключился: {contact.first_name}.\n
+        Номер телефона: {contact.phone_number}.\n
+        Телеграм ID: {contact.user_id}."""
+
+    tg_msg_text = f"Спасибо! Теперь вы можете написать нам о своей проблеме."
 
     zulip_client.send_msg_to_channel(
         channel_name="bot_events",
         topic="новый подписчик",
-        msg=msg_text
+        msg=zulip_msg_text
     )
 
     # сначала channel_name = user.topic_name = [phone]_[tg_id]
-    # после того как получис channel_id и сохраним его,
+    # после того как получим channel_id и сохраним его,
     # channel_name можно в Zulip переименовать вручную в понятное название клиента
     channel_name = user.topic_name
 
@@ -124,7 +133,7 @@ async def get_contact(message: Message):
 
 
     await message.answer(
-        msg_text,
+        tg_msg_text,
         reply_markup=ReplyKeyboardRemove()
     )
 

@@ -31,7 +31,7 @@ class DB:
             session.add(user_db)
             session.commit()
             session.refresh(user_db)
-            logger.info(f"Добавлен Клиент {user}.")
+            logger.info(f"В базу добавлен Клиент: {user}.")
         except exc.IntegrityError:
             logger.info(f"Клиент с номером телефона {user.phone_number} уже существует")
             session.rollback()
@@ -81,9 +81,6 @@ class DB:
 
         try:
             result: User = session.exec(statement).one_or_none()
-
-            log_message = f"Пользователь {'найден' if result else 'не найден'}"
-            logger.info(log_message)
             return result
         except exc.SQLAlchemyError as e:
             logger.error(f"Ошибка при поиске Пользователя по фильтрам {filter}: {e}")
